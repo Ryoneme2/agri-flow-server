@@ -11,13 +11,14 @@ datasource db {
 }
 
 model Users {
-  username  String  @id
-  email     String  @unique
-  firstName String  @default("")
-  lastName  String  @default("")
-  password  String?
-  level     Int     @default(0) // 0 => standard, 1 => premium
-  isVerify  Boolean @default(false)
+  username     String  @id
+  email        String  @unique
+  firstName    String  @default("")
+  lastName     String  @default("")
+  imageProfile String
+  password     String?
+  level        Int     @default(0) // 0 => standard, 1 => premium
+  isVerify     Boolean @default(false)
 
   create_at DateTime @default(now())
 

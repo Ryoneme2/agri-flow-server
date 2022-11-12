@@ -1,11 +1,12 @@
 import moment from 'moment';
 import * as P from '@prisma/client';
 import dotenv from 'dotenv';
-import storageClient from '@config/connectBucket';
 import { v4 } from 'uuid';
 
 import { hashString, decodePassword } from '@util/DecryptEncryptString';
 import uploadToBucket from '@helper/uploadToBucket';
+import storageClient from '@config/connectBucket';
+import defaultValue from '@config/defaultValue';
 
 dotenv.config();
 
@@ -20,7 +21,8 @@ export const _add = async ({ username, password, email }) => {
       data: {
         username,
         password: hashedPass.hash,
-        email
+        email,
+        imageProfile: defaultValue.blankImage
       }
     })
 
