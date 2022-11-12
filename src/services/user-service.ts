@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import storageClient from '@config/connectBucket';
 import { v4 } from 'uuid';
 
-// import { hashString, decodePassword } from '@util/DecryptEncryptString';
+import { hashString, decodePassword } from '@util/DecryptEncryptString';
 // import uploadToBucket from '@helper/uploadToBucket';
 
 dotenv.config();
