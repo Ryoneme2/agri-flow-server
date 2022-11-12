@@ -45,14 +45,50 @@ export const _add = async ({ username, password, email, imageProfile = defaultVa
   }
 }
 
-export const _getOne = async <T>({ rawConfig }: { rawConfig: P.Prisma.UsersFindUniqueArgs }): Promise<{
-  success: boolean,
-  data: T | null,
-  msg: string
-}> => {
+export const _getOne = async ({ username }) => {
   try {
 
-    const user = await prisma.users.findUnique(rawConfig) as T
+    const user = await prisma.users.findUnique({
+      where: {
+        username,
+      }
+    })
+
+    return {
+      success: true,
+      data: user,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error'
+    }
+  }
+}
+
+export const _getOneAll = async ({ username }) => {
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        username,
+      },
+      include: {
+        Blogs: {
+          include: {
+            _count: true
+          }
+        },
+        BlogsOnCommunity: {
+          include: {
+            _count: true
+          }
+        }
+      }
+    })
 
     return {
       success: true,

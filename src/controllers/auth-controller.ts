@@ -38,17 +38,7 @@ const singleSignOn = async (req: Request, res: Response) => {
 
     const userData = await axios.get<GoogleUserResponse>(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${data.token}`)
 
-    const userWithPosts = Prisma.validator<Prisma.UsersArgs>()({})
-
-    type UserWithPosts = Prisma.UsersGetPayload<typeof userWithPosts>
-
-    const user = await userService._getOne<UserWithPosts>({
-      rawConfig: {
-        where: {
-          email: userData.data.email
-        }
-      }
-    })
+    const user = await userService._getOne({ username: userData.data.name })
 
     if (user === null) {
       const resAddedUser = await userService._add({ username: userData.data.name, password: null, email: userData.data.email, imageProfile: userData.data.picture })
