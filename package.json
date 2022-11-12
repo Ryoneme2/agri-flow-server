@@ -20,7 +20,8 @@
     "@controller": "src/controllers",
     "@service": "src/services",
     "@util": "src/utils",
-    "@helper": "src/helpers"
+    "@helper": "src/helpers",
+    "@model": "src/models"
   },
   "dependencies": {
     "@prisma/client": "^4.0.0",

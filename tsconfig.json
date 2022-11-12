@@ -16,7 +16,8 @@
       "@controller/*": ["./controllers/*"],
       "@service/*": ["./services/*"],
       "@util/*": ["./utils/*"],
-      "@helper/*": ["./helpers/*"]
+      "@helper/*": ["./helpers/*"],
+      "@model/*": ["./models/*"]
     },
     // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

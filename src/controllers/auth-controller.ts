@@ -1,15 +1,24 @@
 import type { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken'
 dotenv.config()
 
 import { httpStatus } from '@config/http';
-// import { _addUser, _getOne } from '@service/user-service';
-// import { decodePassword } from '@util/DecryptEncryptString';
+import { validateSchema } from '@helper/validateSchema';
+import * as schema from '@model/ajvSchema'
+import * as userService from '@service/user-service'
 
-const signupWithEmail = (req: Request, res: Response) => {
+const signupWithEmail = async (req: Request, res: Response) => {
   try {
-    res.sendStatus(httpStatus.notImplemented)
+    const data = req.body
+
+    const { success, msg } = validateSchema(schema.registerSchema, data)
+    if (!success) return res.status(httpStatus.badRequest).send({ msg })
+
+    const response = await userService._add(data)
+
+    if (!response.success) return res.status(httpStatus.internalServerError).send(response)
+
+    res.send(response)
   } catch (e) {
     console.error(e);
     res.sendStatus(httpStatus.internalServerError)
