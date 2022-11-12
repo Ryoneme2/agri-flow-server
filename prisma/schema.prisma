@@ -1,0 +1,105 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  username  String  @id
+  email     String  @unique
+  firstName String  @default("")
+  lastName  String  @default("")
+  password  String?
+  level     Int     @default(0) // 0 => standard, 1 => premium
+  isVerify  Boolean @default(false)
+
+  create_at DateTime @default(now())
+
+  Community        Community[]
+  Blogs            Blogs[]
+  DiscussPost      DiscussPost[]
+  BlogsOnCommunity BlogsOnCommunity[]
+
+  BlogCommunityComment BlogCommunityComment[]
+  DiscussComment       DiscussComment[]
+  BlogComment          BlogComment[]
+}
+
+model Blogs {
+  blogId        Int      @id @default(autoincrement())
+  create_by     Users    @relation(fields: [usersUsername], references: [username])
+  usersUsername String
+  content       String   @db.Text
+  create_at     DateTime @default(now())
+
+  BlogComment BlogComment[]
+}
+
+model DiscussPost {
+  dcpId         Int      @id @default(autoincrement())
+  create_by     Users    @relation(fields: [usersUsername], references: [username])
+  usersUsername String
+  create_at     DateTime @default(now())
+
+  DiscussComment DiscussComment[]
+}
+
+model Community {
+  commuId       String   @id @default(cuid())
+  name          String
+  popularity    Int
+  create_by     Users    @relation(fields: [usersUsername], references: [username])
+  usersUsername String
+  create_at     DateTime @default(now())
+
+  BlogsOnCommunity BlogsOnCommunity[]
+}
+
+model BlogsOnCommunity {
+  blogId           Int       @id @default(autoincrement())
+  create_by        Users     @relation(fields: [usersUsername], references: [username])
+  usersUsername    String
+  at_community     Community @relation(fields: [communityCommuId], references: [commuId])
+  communityCommuId String
+  content          String    @db.Text
+  create_at        DateTime  @default(now())
+
+  BlogComment BlogCommunityComment[]
+}
+
+model BlogComment {
+  id        Int      @id @default(autoincrement())
+  create_at DateTime @default(now())
+
+  comment_by    Users  @relation(fields: [usersUsername], references: [username])
+  blog          Blogs  @relation(fields: [blogsBlogId], references: [blogId])
+  blogsBlogId   Int
+  usersUsername String
+}
+
+model BlogCommunityComment {
+  id        Int      @id @default(autoincrement())
+  create_at DateTime @default(now())
+
+  comment_by             Users            @relation(fields: [usersUsername], references: [username])
+  usersUsername          String
+  BlogsOnCommunity       BlogsOnCommunity @relation(fields: [blogsOnCommunityBlogId], references: [blogId])
+  blogsOnCommunityBlogId Int
+}
+
+model DiscussComment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  create_at DateTime @default(now())
+
+  dicuss_by        Users       @relation(fields: [usersUsername], references: [username])
+  usersUsername    String
+  discuss_at       DiscussPost @relation(fields: [discussPostDcpId], references: [dcpId])
+  discussPostDcpId Int
+}

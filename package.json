@@ -10,7 +10,9 @@
     "build": "tsc -p .",
     "dev": "nodemon src/server.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "generateUml": "npx prisma-uml ./prisma/schema.prisma -o png -f ./database/uml/uml.png",
+    "generateUml:svg": "npx prisma-uml ./prisma/schema.prisma -o svg -f ./database/uml/uml.png"
   },
   "_moduleAliases": {
     "@middleware": "src/middleware",
