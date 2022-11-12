@@ -12,17 +12,21 @@ dotenv.config();
 
 const prisma = new P.PrismaClient();
 
-export const _add = async ({ username, password, email }) => {
+export const _add = async ({ username, password, email, imageProfile = defaultValue.blankImage }: {
+  username: string,
+  password: string | null,
+  email: string,
+  imageProfile?: string
+}) => {
   try {
-    const hashedPass = await hashString(password)
-    if (!hashedPass) throw new Error()
+    const hashedPass = !password ? null : await hashString(password) || null
 
     await prisma.users.create({
       data: {
         username,
-        password: hashedPass.hash,
+        password: hashedPass?.hash || null,
         email,
-        imageProfile: defaultValue.blankImage
+        imageProfile
       }
     })
 
@@ -38,5 +42,30 @@ export const _add = async ({ username, password, email }) => {
     }
   } finally {
     prisma.$disconnect()
+  }
+}
+
+export const _getOne = async <T>({ rawConfig }: { rawConfig: P.Prisma.UsersFindUniqueArgs }): Promise<{
+  success: boolean,
+  data: T | null,
+  msg: string
+}> => {
+  try {
+
+    const user = await prisma.users.findUnique(rawConfig) as T
+
+    return {
+      success: true,
+      data: user,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error'
+    }
   }
 }

@@ -6,5 +6,5 @@ export const validateSchema = (schema: string | Schema, data: unknown) => {
 
   if (!valid) return { success: false, msg: ajv.errors }
 
-  return { success: true, msg: 'OK' }
+  return { success: true, msg: ajv.errors }
 }
