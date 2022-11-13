@@ -2,7 +2,7 @@ import { client, connectClient, quitClient } from '@config/redisConnect'
 import { Request, Response, NextFunction } from 'express'
 import { httpStatus } from '@config/http'
 
-const cacheCheck = async (req: Request, res: Response, next: NextFunction) => {
+export const cacheByParam = async (req: Request, res: Response, next: NextFunction) => {
   try {
     await connectClient()
 
@@ -28,5 +28,3 @@ const cacheCheck = async (req: Request, res: Response, next: NextFunction) => {
     await quitClient()
   }
 }
-
-export default cacheCheck

@@ -22,6 +22,9 @@ model Users {
 
   create_at DateTime @default(now())
 
+  followedBy Follows[] @relation("follower")
+  following  Follows[] @relation("following")
+
   Community        Community[]
   Blogs            Blogs[]
   DiscussPost      DiscussPost[]
@@ -30,6 +33,15 @@ model Users {
   BlogCommunityComment BlogCommunityComment[]
   DiscussComment       DiscussComment[]
   BlogComment          BlogComment[]
+}
+
+model Follows {
+  follower      Users  @relation("follower", fields: [followerUser], references: [username])
+  followerUser  String
+  following     Users  @relation("following", fields: [followingUser], references: [username])
+  followingUser String
+
+  @@id([followerUser, followingUser])
 }
 
 model Blogs {
