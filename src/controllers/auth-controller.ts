@@ -29,7 +29,7 @@ const singleSignOn = async (req: Request, res: Response) => {
     const { success, msg } = validateSchema(schema.registerSSOSchema, data)
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    const userData = await axios.get<GoogleUserResponse>(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${data.token}`)
+    const userData = await axios.get<GoogleUserResponse>(`https://www.googleapis.com/oauth2/v2/tokeninfo?access_token=${data.token}`)
 
     const user = await userService._getOne({ username: userData.data.user_id })
 
