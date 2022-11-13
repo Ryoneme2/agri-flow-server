@@ -1,6 +1,6 @@
 FROM node:18
 
-RUN mkdir /use/app/server
+RUN mkdir /usr/app/server
 
 WORKDIR /usr/app/server
 
