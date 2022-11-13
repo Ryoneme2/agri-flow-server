@@ -49,6 +49,7 @@ model Blogs {
   create_by     Users    @relation(fields: [usersUsername], references: [username])
   usersUsername String
   content       String   @db.Text
+  title         String
   create_at     DateTime @default(now())
 
   BlogComment BlogComment[]
@@ -81,6 +82,7 @@ model BlogsOnCommunity {
   at_community     Community @relation(fields: [communityCommuId], references: [commuId])
   communityCommuId String
   content          String    @db.Text
+  title            String
   create_at        DateTime  @default(now())
 
   BlogComment BlogCommunityComment[]

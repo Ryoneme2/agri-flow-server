@@ -39,3 +39,16 @@ export const loginSchema: SchemaObject = {
   ],
   additionalProperties: { "type": "object" }
 }
+
+export const newPostSchema: SchemaObject = {
+  type: "object",
+  properties: {
+    title: { type: "string" },
+    content: { type: "string" }
+  },
+  required: [
+    "title",
+    "content"
+  ],
+  additionalProperties: false
+}

@@ -20,6 +20,7 @@ app.use(rateLimit({
 }))
 
 app.use('/api/v1/auth', routes.authRoute)
+app.use('/api/v1/blogs', routes.blogRoute)
 
 app.get('/testGet', (_, res) => {
   res.status(200).send('Get success')
