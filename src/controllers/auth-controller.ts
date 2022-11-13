@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 dotenv.config()
 
 import { httpStatus } from '@config/http';
+import defaultValue from '@config/defaultValue';
 import { validateSchema } from '@helper/validateSchema';
 import * as schema from '@model/ajvSchema'
 import * as userService from '@service/user-service'
@@ -12,23 +13,14 @@ import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 
 type GoogleUserResponse = {
-  iss: string;
-  nbf: string;
-  aud: string;
-  sub: string;
+  issued_to: string;
+  audience: string;
+  user_id: string;
+  scope: string;
+  expires_in: number;
   email: string;
-  email_verified: string;
-  azp: string;
-  name: string;
-  picture: string;
-  given_name: string;
-  family_name: string;
-  iat: string;
-  exp: string;
-  jti: string;
-  alg: string;
-  kid: string;
-  typ: string;
+  verified_email: boolean;
+  access_type: string;
 }
 
 const singleSignOn = async (req: Request, res: Response) => {
@@ -39,10 +31,10 @@ const singleSignOn = async (req: Request, res: Response) => {
 
     const userData = await axios.get<GoogleUserResponse>(`https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${data.token}`)
 
-    const user = await userService._getOne({ username: userData.data.name })
+    const user = await userService._getOne({ username: userData.data.user_id })
 
     if (user === null) {
-      const resAddedUser = await userService._add({ username: userData.data.name, password: null, email: userData.data.email, imageProfile: userData.data.picture })
+      const resAddedUser = await userService._add({ username: userData.data.user_id, password: null, email: userData.data.email, imageProfile: defaultValue.blankImage })
       if (!resAddedUser.success) return res.sendStatus(httpStatus.internalServerError)
     }
 
@@ -55,7 +47,7 @@ const singleSignOn = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        username: userData.data.name,
+        username: userData.data.user_id,
         email: userData.data.email,
       },
       secret
