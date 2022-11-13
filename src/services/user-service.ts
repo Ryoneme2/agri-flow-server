@@ -35,17 +35,34 @@ export const _add = async ({ username, password, email, imageProfile = defaultVa
       msg: 'created'
     }
   } catch (error) {
-    console.error(error)
-    return {
-      success: false,
-      msg: 'internal error add user to database'
+    console.log(error);
+    if (error instanceof P.Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (error.code === 'P2002') {
+        return {
+          isOk: false,
+          data: {},
+          msg: `username is already taken`,
+        };
+      }
+      return {
+        isOk: false,
+        data: {},
+        msg: 'Internal Server Error register service',
+      };
     }
+
+    return {
+      isOk: false,
+      data: {},
+      msg: 'Internal Server Error register service',
+    };
   } finally {
     prisma.$disconnect()
   }
 }
 
-export const _getOne = async ({ username }) => {
+export const _getOne = async ({ username }: { username: string }) => {
   try {
 
     const user = await prisma.users.findUnique({
@@ -70,7 +87,32 @@ export const _getOne = async ({ username }) => {
   }
 }
 
-export const _getOneAll = async ({ username }) => {
+export const _getOneMail = async ({ mail }: { mail: string }) => {
+  try {
+
+    const user = await prisma.users.findUnique({
+      where: {
+        email: mail,
+      }
+    })
+
+    return {
+      success: true,
+      data: user,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error'
+    }
+  }
+}
+
+export const _getOneAll = async ({ username }: { username: string }) => {
   try {
     const user = await prisma.users.findUnique({
       where: {
