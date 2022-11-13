@@ -19,8 +19,12 @@ app.use(rateLimit({
   message: "Too many requests from this IP, please try again"
 }))
 
+
 app.use('/api/v1/auth', routes.authRoute)
 app.use('/api/v1/blogs', routes.blogRoute)
+
+
+app.use('/api/v1/test', routes.test)
 
 app.get('/testGet', (_, res) => {
   res.status(200).send('Get success')
