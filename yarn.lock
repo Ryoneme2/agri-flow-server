@@ -4122,7 +4122,7 @@ json5@^1.0.1:
   dependencies:
     minimist "^1.2.0"
 
-json5@^2.2.1:
+json5@^2.2.0, json5@^2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.1.tgz#655d50ed1e6f95ad1a3caababd2b0efda10b395c"
   integrity sha512-1hqLFMSrGHRHxav9q9gNjJ5EXznIxGVO09xQRrwplcS8qs28pZ8s8hupZAmqDwZUmVZ2Qb2jnyPOWcDH8m8dlA==
@@ -5723,6 +5723,13 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha512-WZGXGstmCWgeevgTL54hrCuw1dyMQIzWy7ZfqRJfSmJZBwklI15egmQytFP6bPidmw3M8d5yEowl1niq4vmqZw==
+
+ts-alias@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/ts-alias/-/ts-alias-0.0.5.tgz#b770a927d79fbb7ae2782eadfaff7add472b4fd8"
+  integrity sha512-kV/YBt1Zmy94s5bAf5TY0VggIWh02tueA9V8C/x5CPWqjotGQenXtV0v0+tEkDxpCF67d4IoH3u5Hfly0srPrg==
+  dependencies:
+    json5 "^2.2.0"
 
 ts-node-dev@^1.1.8:
   version "1.1.8"
