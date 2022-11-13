@@ -1,6 +1,5 @@
 import { SchemaObject } from 'ajv'
 import type { JTDSchemaType } from "ajv/dist/jtd"
-import * as format from '../@types/validateFormat'
 
 export const registerSchema: SchemaObject = {
   type: "object",
@@ -31,7 +30,7 @@ export const registerSSOSchema: SchemaObject = {
 export const loginSchema: SchemaObject = {
   type: "object",
   properties: {
-    email: format.fullFormats.email,
+    email: { type: "string" },
     password: { type: "string" }
   },
   required: [
