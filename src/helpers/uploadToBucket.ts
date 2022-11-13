@@ -3,7 +3,7 @@ import storageClient from '@config/connectBucket';
 const uploadToBucket = async (fileName: string, folder: 'avatar' | 'blog' | 'community' | 'discuss', file: Buffer, bucketName: 'image-bucket') => {
   try {
     const storageUrl =
-      `https://oijsgpmyxcrqexaewofb.supabase.co/storage/v1/object/public/${bucketName}/`;
+      `https://fphftuccochbjgwngnrc.supabase.co/storage/v1/object/public/${bucketName}/`;
 
     const response = await storageClient
       .from(bucketName)

@@ -74,7 +74,7 @@ const singleSignOn = async (req: Request, res: Response) => {
         msg: e.response?.data.error_description || 'error something about token'
       })
     }
-    res.sendStatus(httpStatus.internalServerError)
+    return res.sendStatus(httpStatus.internalServerError)
   }
 }
 
@@ -98,7 +98,7 @@ const signupWithEmail = async (req: Request, res: Response) => {
     res.send(response)
   } catch (e) {
     console.error(e);
-    res.sendStatus(httpStatus.internalServerError)
+    return res.sendStatus(httpStatus.internalServerError)
   }
 }
 
@@ -125,7 +125,7 @@ const signInWithEmail = async (req: Request, res: Response) => {
 
     const isPasswordMatch = await decodePassword(data.password, user.data.password);
 
-    if (data.username !== user.data?.username || !isPasswordMatch)
+    if (data.email !== user.data?.email || !isPasswordMatch)
       return res.status(httpStatus.forbidden).send({
         msg: 'username or password not match',
       });
@@ -157,7 +157,7 @@ const signInWithEmail = async (req: Request, res: Response) => {
     res.sendStatus(httpStatus.notImplemented)
   } catch (error) {
     console.error(error);
-    res.sendStatus(httpStatus.internalServerError)
+    return res.sendStatus(httpStatus.internalServerError)
   }
 }
 
