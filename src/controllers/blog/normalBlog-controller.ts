@@ -55,14 +55,6 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
       msg: 'blog id is require'
     })
 
-    if (!req.jwtObject) return res.send({
-      status: httpStatus.unauthorized,
-      data: null,
-      message: 'Access denied unauthorized.'
-    })
-
-    const userObjJWT = req.jwtObject as UserJwtPayload;
-
     const blog = await blogService._getOne(+blogId)
 
     if (!blog.success) return res.status(httpStatus.conflict).send(blog)
