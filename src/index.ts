@@ -11,8 +11,8 @@ const app: Express = express()
 
 // express server config
 app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+app.use(express.json({ limit: '50mb' }));
 app.use(rateLimit({
   windowMs: 10000,
   max: 200,

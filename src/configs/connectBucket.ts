@@ -3,7 +3,7 @@ import { StorageClient as SupabaseStorageClient } from '@supabase/storage-js'
 dotenv.config();
 
 const STORAGE_URL = 'https://fphftuccochbjgwngnrc.supabase.co/storage/v1';
-const SERVICE_KEY = process.env.SERVICE_KEY_SUPABASE;
+const SERVICE_KEY = process.env.SERVICE_KEY;
 
 if (!SERVICE_KEY) throw new Error("SERVICE_KEY NOT FOUND")
 
