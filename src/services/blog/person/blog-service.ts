@@ -64,6 +64,8 @@ export const _add = async ({ author, title, content }: { author: string, title: 
       success: false,
       msg: 'internal error on add blog service'
     }
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
@@ -96,5 +98,7 @@ export const _getOne = async (id: number) => {
       data: null,
       msg: 'internal error on get one blog person'
     }
+  } finally {
+    await prisma.$disconnect()
   }
 }

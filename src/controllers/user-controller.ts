@@ -12,6 +12,18 @@ import * as userService from '@service/user-service'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 
+const getOne = async (req: Request, res: Response) => {
+  try {
+
+
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+
+  }
+}
+
 
 export {
 }

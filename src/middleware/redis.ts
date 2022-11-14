@@ -6,16 +6,13 @@ export const cacheByParam = async (req: Request, res: Response, next: NextFuncti
   try {
     await connectClient()
 
-    const params = Object.values(req.params)
+    const params = Object.entries(req.params)
 
     if (!params) return next()
 
-    const value = await Promise.all(params.map(v => client.get(v)))
+    const key = params.map(([key, value]) => `${key}-${value}`).join('')
 
-    if (value.every(v => v === null)) {
-      next()
-      return
-    }
+    const value = await client.get(key)
 
     res.status(httpStatus.ok).send({
       cached: true,

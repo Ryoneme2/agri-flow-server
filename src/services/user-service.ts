@@ -58,7 +58,7 @@ export const _add = async ({ username, password, email, imageProfile = defaultVa
       msg: 'Internal Server Error register service',
     };
   } finally {
-    prisma.$disconnect()
+    await prisma.$disconnect()
   }
 }
 
@@ -84,6 +84,8 @@ export const _getOne = async ({ username }: { username: string }) => {
       data: null,
       msg: 'internal error'
     }
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
@@ -109,6 +111,8 @@ export const _getOneMail = async ({ mail }: { mail: string }) => {
       data: null,
       msg: 'internal error'
     }
+  } finally {
+    await prisma.$disconnect()
   }
 }
 
@@ -145,5 +149,7 @@ export const _getOneAll = async ({ username }: { username: string }) => {
       data: null,
       msg: 'internal error'
     }
+  } finally {
+    await prisma.$disconnect()
   }
 }

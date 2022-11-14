@@ -2,11 +2,11 @@ import * as redis from 'redis'
 import dotenv from 'dotenv'
 dotenv.config()
 
-const host = process.env.NODE_ENV === 'production' ? 'cache' : '127.0.0.1'
+const host = process.env.REDIS_HOST
 
 const client = redis.createClient({
-  url: `redis://${host}:6379`,
-  password: process.env.PASSWORD,
+  url: `rediss://default:${process.env.REDIS_PASSWORD}@${host}:${process.env.REDIS_PORT}`,
+  password: process.env.REDIS_PASSWORD,
 })
 
 const connectClient = async () => {
