@@ -15,7 +15,7 @@ import { decodePassword } from '@util/DecryptEncryptString';
 const getOne = async (req: Request, res: Response) => {
   try {
 
-
+    res.sendStatus(httpStatus.notImplemented)
 
   } catch (e) {
     console.error(e);
@@ -26,4 +26,5 @@ const getOne = async (req: Request, res: Response) => {
 
 
 export {
+  getOne
 }

@@ -10,7 +10,7 @@ export const cacheByParam = async (req: Request, res: Response, next: NextFuncti
 
     if (!params) return next()
 
-    const key = params.map(([key, value]) => `${key}-${value}`).join('')
+    const key = params.map(([k, v]) => `${k}-${v}`).join('')
 
     const value = await client.get(key)
 
