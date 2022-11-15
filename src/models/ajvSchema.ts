@@ -51,3 +51,16 @@ export const newPostSchema: SchemaObject = {
   ],
   additionalProperties: false
 }
+
+export const resetPassword: SchemaObject = {
+  type: "object",
+  properties: {
+    token: { type: "string" },
+    password: { type: "string" }
+  },
+  required: [
+    "token",
+    "password"
+  ],
+  additionalProperties: false
+}

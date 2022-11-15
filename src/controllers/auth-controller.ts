@@ -146,8 +146,6 @@ const signInWithEmail = async (req: Request, res: Response) => {
       }
     })
 
-
-    res.sendStatus(httpStatus.notImplemented)
   } catch (error) {
     console.error(error);
     return res.sendStatus(httpStatus.internalServerError)
@@ -155,6 +153,37 @@ const signInWithEmail = async (req: Request, res: Response) => {
 }
 
 const resetPassword = async (req: Request, res: Response) => {
+  try {
+
+    const data: {
+      token: string,
+      password: string
+    } = req.body
+
+    if (!process.env.JWT_SECRET) throw new Error('no jwt secret')
+
+    const valid = validateSchema(schema.resetPassword, data)
+
+    if (!valid.success) return res.status(httpStatus.badRequest).send({ msg: valid.msg })
+
+    const decoded = jwt.verify(data.token, process.env.JWT_SECRET) as {
+      email: string
+    }
+
+    const dataResponse = await userService._updatePassByEmail({ email: decoded.email, pass: data.password })
+
+    if (!dataResponse.success) return res.status(httpStatus.internalServerError).send(dataResponse)
+
+    res.sendStatus(httpStatus.created)
+
+  } catch (e) {
+    console.error(e);
+
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+const resetPasswordRequest = async (req: Request, res: Response) => {
   try {
 
     const { email } = req.body
@@ -172,9 +201,9 @@ const resetPassword = async (req: Request, res: Response) => {
       expiresIn: 1000 * 60 * 60 * 2 // 2 hour
     })
 
-    const host = process.env.NODE_ENV === 'develop' ? 'http://localhost:3000' : 'https://agri-flow-client.vercel.app'
+    const host = process.env.NODE_ENV === 'develop' ? 'http://localhost:3000' : 'https://agri-flow-client.vercel.app/login/reset-password'
 
-    const mail = await sendMail.forgetPass(email, `${host}/api/v1/auth/resetPassword?token=${token}`)
+    const mail = await sendMail.forgetPass(email, `${host}?token=${token}`)
 
     if (!mail.success) return res.status(httpStatus.badRequest).send(mail)
 
@@ -190,5 +219,6 @@ export {
   signupWithEmail,
   signInWithEmail,
   singleSignOn,
+  resetPasswordRequest,
   resetPassword
 }

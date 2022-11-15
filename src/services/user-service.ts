@@ -153,3 +153,37 @@ export const _getOneAll = async ({ username }: { username: string }) => {
     await prisma.$disconnect()
   }
 }
+
+export const _updatePassByEmail = async ({ email, pass }: { email: string, pass: string }) => {
+  try {
+
+    const hashedPassword = await hashString(pass)
+
+    if (!hashedPassword) return {
+      success: false,
+      msg: 'can not hash password'
+    }
+
+    await prisma.users.update({
+      where: {
+        email,
+      },
+      data: {
+        password: hashedPassword.hash
+      }
+    })
+
+    return {
+      success: true,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'can not hash password'
+    }
+
+  }
+}
