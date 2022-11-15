@@ -4,7 +4,7 @@ export const registerSchema: SchemaObject = {
   type: "object",
   properties: {
     password: { type: "string", minLength: 8 },
-    email: { type: 'string' },
+    email: { type: 'string', minLength: 1 },
     username: { type: "string", minLength: 5 }
   },
   required: [
@@ -42,8 +42,8 @@ export const loginSchema: SchemaObject = {
 export const newPostSchema: SchemaObject = {
   type: "object",
   properties: {
-    title: { type: "string" },
-    content: { type: "string" }
+    title: { type: "string", minLength: 1 },
+    content: { type: "string", minLength: 1 }
   },
   required: [
     "title",
