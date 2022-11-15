@@ -1,5 +1,4 @@
 import { SchemaObject } from 'ajv'
-import type { JTDSchemaType } from "ajv/dist/jtd"
 
 export const registerSchema: SchemaObject = {
   type: "object",

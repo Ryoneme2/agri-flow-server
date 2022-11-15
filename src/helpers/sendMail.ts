@@ -1,8 +1,8 @@
 import nodemailer from "nodemailer"
 import axios from "axios"
 import dotenv from 'dotenv'
-import { TokenResponse } from "../@types/googleType";
-import { forgetPass } from "../mocks/tmpGmailContext";
+import { TokenResponse } from "@type/googleType";
+import { forgetPass } from "@mock/tmpGmailContext";
 dotenv.config()
 
 const cred = {

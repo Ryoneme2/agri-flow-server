@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import type { IGetUserAuthInfoRequest, UserJwtPayload } from '../../@types/jwt'
+import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt'
 import axios, { AxiosError } from 'axios'
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken'

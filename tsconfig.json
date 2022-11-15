@@ -17,7 +17,9 @@
       "@service/*": ["./services/*"],
       "@util/*": ["./utils/*"],
       "@helper/*": ["./helpers/*"],
-      "@model/*": ["./models/*"]
+      "@model/*": ["./models/*"],
+      "@type/*": ["./@types/*"],
+      "@mock/*": ["./mocks/*"]
     },
     // "paths": {},                                      /* Specify a set of entries that re-map imports to additional lookup locations. */
     // "rootDirs": [],                                   /* Allow multiple folders to be treated as one when resolving modules. */

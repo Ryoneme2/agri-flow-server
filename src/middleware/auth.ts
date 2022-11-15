@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { Response, NextFunction } from 'express';
 import { httpStatus } from '@config/http';
-import type { UserJwtPayload, IGetUserAuthInfoRequest } from '../@types/jwt'
+import type { UserJwtPayload, IGetUserAuthInfoRequest } from '@type/jwt'
 dotenv.config();
 
 const auth = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
