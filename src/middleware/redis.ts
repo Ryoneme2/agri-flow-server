@@ -14,9 +14,11 @@ export const cacheByParam = async (req: Request, res: Response, next: NextFuncti
 
     const value = await client.get(key)
 
+    if (value === null) return next()
+
     res.status(httpStatus.ok).send({
       cached: true,
-      data: value,
+      data: JSON.parse(value),
       msg: 'success get data'
     })
   } catch (e) {
