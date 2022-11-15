@@ -76,7 +76,15 @@ export const _getOne = async (id: number) => {
         blogId: id
       },
       include: {
-        create_by: true,
+        create_by: {
+          include: {
+            Blogs: {
+              select: {
+                blogId: true
+              }
+            }
+          }
+        },
         BlogComment: {
           include: {
             comment_by: true

@@ -90,6 +90,7 @@ model BlogsOnCommunity {
 
 model BlogComment {
   id        Int      @id @default(autoincrement())
+  context   String
   create_at DateTime @default(now())
 
   comment_by    Users  @relation(fields: [usersUsername], references: [username])
@@ -100,6 +101,7 @@ model BlogComment {
 
 model BlogCommunityComment {
   id        Int      @id @default(autoincrement())
+  context   String
   create_at DateTime @default(now())
 
   comment_by             Users            @relation(fields: [usersUsername], references: [username])

@@ -12,6 +12,7 @@ import * as schema from '@model/ajvSchema'
 import * as blogService from '@service/blog/person/blog-service'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
+import moment from 'moment';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -59,7 +60,35 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!blog.success) return res.status(httpStatus.conflict).send(blog)
 
-    res.send(blog)
+    if (!blog.data) return res.send({ msg: 'no blog found' })
+
+    const format = {
+      blogContent: {
+        title: blog.data.title,
+        content: blog.data.content
+      },
+      create_at: moment(blog.data.create_at).fromNow(),
+      comments: blog.data.BlogComment.map(comment => {
+        return {
+          username: comment.comment_by.username,
+          content: comment.context,
+          create_at: moment(comment.create_at).fromNow()
+        }
+      }),
+      author: {
+        username: blog.data.create_by.username,
+        imageProfile: blog.data.create_by.imageProfile,
+        blogCount: blog.data.create_by.Blogs.length,
+        followerCount: 0,
+        socialMedia: {
+          facebook: '',
+          line: '',
+          email: blog.data.create_by.email
+        }
+      }
+    }
+
+    res.send({ data: format })
 
   } catch (e) {
     console.error(e);
