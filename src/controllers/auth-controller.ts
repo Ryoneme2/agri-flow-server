@@ -1,3 +1,4 @@
+import sendMail from '@helper/sendMail';
 import type { Request, Response } from 'express';
 import axios, { AxiosError } from 'axios'
 import dotenv from 'dotenv';
@@ -153,8 +154,41 @@ const signInWithEmail = async (req: Request, res: Response) => {
   }
 }
 
+const resetPassword = async (req: Request, res: Response) => {
+  try {
+
+    const { email } = req.body
+
+    const mailRegex = new RegExp(/^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,63})$/)
+
+    const validMail = mailRegex.test(email)
+
+    if (!validMail) return res.status(httpStatus.badRequest).send({ msg: 'invalid email' })
+
+    const token = jwt.sign({
+      email,
+      validToken: true
+    }, process.env.JWT_SECRET || '', {
+      expiresIn: 1000 * 60 * 60 * 2 // 2 hour
+    })
+
+    const host = process.env.NODE_ENV === 'develop' ? 'http://localhost:3000' : 'https://agri-flow-client.vercel.app'
+
+    const mail = await sendMail.forgetPass(email, `${host}/api/v1/auth/resetPassword?token=${token}`)
+
+    if (!mail.success) return res.status(httpStatus.badRequest).send(mail)
+
+    res.send(mail)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
 export {
   signupWithEmail,
   signInWithEmail,
-  singleSignOn
+  singleSignOn,
+  resetPassword
 }

@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import 'module-alias/register';
-import express, { Express } from "express";
+import express, { Express, Response, NextFunction, Request } from "express";
 import { rateLimit } from 'express-rate-limit';
 import cors from "cors";
 dotenv.config()
@@ -18,6 +18,7 @@ app.use(rateLimit({
   max: 200,
   message: "Too many requests from this IP, please try again"
 }))
+
 
 app.use('/api/v1/auth', routes.authRoute)
 app.use('/api/v1/blogs', routes.blogRoute)

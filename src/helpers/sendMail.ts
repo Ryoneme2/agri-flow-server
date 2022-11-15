@@ -37,7 +37,6 @@ async function sendMail({ to, subject, context }) {
       },
     });
 
-
     const info = await transporter.sendMail({
       from: '"Agri-flow" <worknarair6@gmail.com>',
       to,
@@ -45,11 +44,17 @@ async function sendMail({ to, subject, context }) {
       html: context,
     });
 
-    // log ข้อมูลการส่งว่าส่งได้-ไม่ได้
-    console.log("Message sent: %s", info.messageId);
+    return {
+      success: true,
+      msg: info.messageId
+    }
 
   } catch (e) {
     console.error(e);
+    return {
+      success: true,
+      msg: ''
+    }
   }
 };
 
@@ -57,7 +62,7 @@ const helper = {
   raw: sendMail,
   forgetPass: async (to: string, linkReset: string) => {
     const context = forgetPass(linkReset, to)
-    sendMail({ to, subject: "[Agri-Flow] Password Reset", context })
+    return sendMail({ to, subject: "[Agri-Flow] Password Reset", context })
   }
 }
 

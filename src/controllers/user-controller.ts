@@ -27,8 +27,6 @@ const getOne = async (req: Request, res: Response) => {
 
     if (!user.data) return res.send(user)
 
-    await sendEmail.forgetPass('gmgamer50280@gmail.com', 'http://localhost:6969')
-
     await client.setEx(`userUsername-${userUsername}`, 3600, JSON.stringify(user.data))
 
     res.send({ ...user, saveCache: true })
