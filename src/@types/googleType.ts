@@ -40,7 +40,7 @@ export interface Response {
   'is-binary': boolean;
 }
 
-export interface TOKEN_RESPONSE {
+export interface TokenResponse {
   success: boolean;
   access_token: string;
   Request: Request;

@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer"
 import axios from "axios"
 import dotenv from 'dotenv'
-import { TOKEN_RESPONSE } from "../@types/googleType";
+import { TokenResponse } from "../@types/googleType";
 import { forgetPass } from "../mocks/tmpGmailContext";
 dotenv.config()
 
@@ -18,11 +18,11 @@ async function sendMail({ to, subject, context }) {
       refresh_token: cred.refreshToken,
       token_uri: "https://oauth2.googleapis.com/token"
     }
-    const res = await axios.post<TOKEN_RESPONSE>(tokenProviderUrl, data)
+    const res = await axios.post<TokenResponse>(tokenProviderUrl, data)
 
     console.log(res.data);
 
-    let transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false, // true for 465, false for other ports
@@ -38,7 +38,7 @@ async function sendMail({ to, subject, context }) {
     });
 
 
-    let info = await transporter.sendMail({
+    const info = await transporter.sendMail({
       from: '"Agri-flow" <worknarair6@gmail.com>',
       to,
       subject,
