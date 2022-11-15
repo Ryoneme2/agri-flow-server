@@ -4,6 +4,6 @@ import * as redis from '@middleware/redis'
 
 const route = express.Router()
 
-route.get('/:userUsername', redis.cacheByParam, c.getOne)
+route.get('/:userUsername', c.getOne)
 
 export default route

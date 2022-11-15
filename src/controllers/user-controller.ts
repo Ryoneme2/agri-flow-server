@@ -12,6 +12,7 @@ import * as userService from '@service/user-service'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import { client, connectClient, quitClient } from '@config/redisConnect'
+import sendEmail from '@helper/sendMail';
 
 const getOne = async (req: Request, res: Response) => {
   try {
@@ -25,6 +26,8 @@ const getOne = async (req: Request, res: Response) => {
     await connectClient()
 
     if (!user.data) return res.send(user)
+
+    await sendEmail.forgetPass('gmgamer50280@gmail.com', 'http://localhost:6969')
 
     await client.setEx(`userUsername-${userUsername}`, 3600, JSON.stringify(user.data))
 
