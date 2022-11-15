@@ -23,7 +23,7 @@ const getOne = async (req: Request, res: Response) => {
 
     if (!user.success) return res.status(httpStatus.internalServerError).send(user)
 
-    await connectClient()
+    // await connectClient()
 
     if (!user.data) return res.send(user)
 
@@ -36,7 +36,7 @@ const getOne = async (req: Request, res: Response) => {
     return res.sendStatus(httpStatus.internalServerError)
 
   } finally {
-    await quitClient()
+    // await quitClient()
   }
 }
 

@@ -6,28 +6,36 @@ import cors from "cors";
 dotenv.config()
 
 import * as routes from './routes'
+import { connectClient } from '@config/redisConnect';
 
 const app: Express = express()
 
-// express server config
-app.use(cors());
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-app.use(express.json({ limit: '50mb' }));
-app.use(rateLimit({
-  windowMs: 10000,
-  max: 200,
-  message: "Too many requests from this IP, please try again"
-}))
+const myApp = async () => {
 
 
-app.use('/api/v1/auth', routes.authRoute)
-app.use('/api/v1/blogs', routes.blogRoute)
-app.use('/api/v1/users', routes.userRoute)
+  // express server config
+  app.use(cors());
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+  app.use(express.json({ limit: '50mb' }));
+  app.use(rateLimit({
+    windowMs: 10000,
+    max: 200,
+    message: "Too many requests from this IP, please try again"
+  }))
 
-app.use('/api/v1/test', routes.test)
+  await connectClient()
 
-app.get('/testGet', (_, res) => {
-  res.status(200).send('Get success')
-})
+  app.use('/api/v1/auth', routes.authRoute)
+  app.use('/api/v1/blogs', routes.blogRoute)
+  app.use('/api/v1/users', routes.userRoute)
 
+  app.use('/api/v1/test', routes.test)
+
+  app.get('/testGet', (_, res) => {
+    res.status(200).send('Get success')
+  })
+
+}
+
+myApp()
 export default app

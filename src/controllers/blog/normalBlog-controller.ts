@@ -13,6 +13,7 @@ import * as blogService from '@service/blog/person/blog-service'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import moment from 'moment';
+import { connectClient, quitClient, client } from '@config/redisConnect';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -81,18 +82,24 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
         blogCount: blog.data.create_by.Blogs.length,
         followerCount: 0,
         socialMedia: {
-          facebook: '',
-          line: '',
+          facebook: null,
+          line: null,
           email: blog.data.create_by.email
         }
       }
     }
+
+    // await connectClient()
+
+    await client.setEx(`blogId-${blogId}`, 3600, JSON.stringify(format))
 
     res.send({ data: format })
 
   } catch (e) {
     console.error(e);
     res.sendStatus(httpStatus.internalServerError)
+  } finally {
+    // await quitClient()
   }
 }
 
