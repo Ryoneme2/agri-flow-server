@@ -1,3 +1,4 @@
+import { httpStatus } from '@config/http';
 import moment from 'moment';
 import * as P from '@prisma/client';
 import dotenv from 'dotenv';
@@ -114,7 +115,9 @@ export const _getOne = async (id: number) => {
 export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId: number[], skip?: number, limit?: number }) => {
   try {
 
-    const category = !categoryId ? [1, 2, 3] : categoryId
+    const category = categoryId.length === 0 ? [1, 2, 3] : categoryId
+
+    console.log({ category });
 
     const blogs = await prisma.blogs.findMany({
       skip,
@@ -150,6 +153,47 @@ export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId
       success: false,
       data: null,
       msg: 'internal error on get person blog list'
+    }
+  } finally {
+    prisma.$disconnect()
+  }
+}
+
+export const _updateView = async ({ username, blogId }: { username: string, blogId: number }) => {
+  try {
+
+    await prisma.userReadBlogPerson.create({
+      data: {
+        usersUsername: username,
+        BlogId: blogId
+      }
+    })
+
+    return {
+      success: false,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    if (e instanceof P.Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (e.code === 'P2002') {
+        return {
+          isOk: false,
+          data: {},
+          msg: `id is duplicate`,
+        };
+      }
+      return {
+        isOk: false,
+        data: {},
+        msg: 'Internal Server Error register service',
+      };
+    }
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on update user view blog service'
     }
   }
 }

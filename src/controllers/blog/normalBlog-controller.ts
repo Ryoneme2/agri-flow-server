@@ -50,8 +50,6 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     const { blogId } = req.params
 
-    const userObjJWT = req.jwtObject as UserJwtPayload;
-
     if (isNaN(+blogId)) return res.status(httpStatus.badRequest).send({
       msg: 'blog id is invalid'
     })
@@ -64,10 +62,6 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
     if (!blog.success) return res.status(httpStatus.internalServerError).send(blog)
 
     if (!blog.data) return res.send({ msg: 'no blog found' })
-
-    // if (userObjJWT !== undefined) {
-
-    // }
 
     const format = {
       blogContent: {
@@ -99,13 +93,11 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     await client.setEx(`blogId-${blogId}`, 3600, JSON.stringify(format))
 
-    res.send({ data: format })
+    return res.send({ data: format })
 
   } catch (e) {
     console.error(e);
-    res.sendStatus(httpStatus.internalServerError)
-  } finally {
-    // await quitClient()
+    return res.sendStatus(httpStatus.internalServerError)
   }
 }
 
@@ -138,7 +130,9 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
       }
     })
 
-    console.log(formatBlog);
+    console.log(formatBlog, {
+      user
+    });
 
     res.send({
       formatBlog,

@@ -16,13 +16,14 @@ export const cacheByParam = async (req: Request, res: Response, next: NextFuncti
 
     if (value === null) return next()
 
-    res.status(httpStatus.ok).send({
+    return res.status(httpStatus.ok).send({
       cached: true,
       data: JSON.parse(value),
       msg: 'success get data'
     })
   } catch (e) {
     console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
   } finally {
     // await quitClient()
   }

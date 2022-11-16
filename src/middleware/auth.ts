@@ -27,9 +27,28 @@ const auth = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) =
   } catch (e) {
     console.error(e);
 
-    res.status(httpStatus.internalServerError).send({
+    return res.status(httpStatus.internalServerError).send({
       msg: 'internal error'
     })
+  }
+}
+
+export const authSoft = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+  try {
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET is not defined');
+    }
+    console.log('auth middleware request');
+    const token = req.header('Authorization');
+
+    if (!token) return next()
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET) as UserJwtPayload;
+    req.jwtObject = decoded;
+  } catch (e) {
+    console.error(e);
+  } finally {
+    return next()
   }
 }
 
