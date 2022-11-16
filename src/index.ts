@@ -11,8 +11,6 @@ import { connectClient } from '@config/redisConnect';
 const app: Express = express()
 
 const myApp = async () => {
-
-
   // express server config
   app.use(cors());
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -38,4 +36,5 @@ const myApp = async () => {
 }
 
 myApp()
+
 export default app

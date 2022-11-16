@@ -20,6 +20,8 @@ model Users {
   level        Int     @default(0) // 0 => standard, 1 => premium
   isVerify     Boolean @default(false)
 
+  readBlog Json
+
   create_at DateTime @default(now())
 
   followedBy Follows[] @relation("follower")
@@ -53,6 +55,15 @@ model Blogs {
   create_at     DateTime @default(now())
 
   BlogComment BlogComment[]
+  Category    Category?     @relation(fields: [categoryId], references: [categoryId])
+  categoryId  Int?
+}
+
+model Category {
+  categoryId   Int    @id @default(autoincrement())
+  categoryName String
+
+  blog Blogs[]
 }
 
 model DiscussPost {

@@ -1,4 +1,4 @@
-import type { Response } from 'express';
+import type { Response, Request } from 'express';
 import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt'
 import axios, { AxiosError } from 'axios'
 import dotenv from 'dotenv';
@@ -13,7 +13,7 @@ import * as blogService from '@service/blog/person/blog-service'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import moment from 'moment';
-import { connectClient, quitClient, client } from '@config/redisConnect';
+import { client } from '@config/redisConnect';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -45,7 +45,7 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   }
 }
 
-const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
+const getOneBlog = async (req: Request, res: Response) => {
   try {
 
     const { blogId } = req.params
@@ -103,7 +103,20 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   }
 }
 
+const getListBlog = (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    const type = !req.query.type ? 'suggest' : req.query.type
+
+  } catch (e) {
+    console.error(e);
+
+
+  }
+}
+
 export {
   newBlog,
-  getOneBlog
+  getOneBlog,
+  getListBlog
 }
