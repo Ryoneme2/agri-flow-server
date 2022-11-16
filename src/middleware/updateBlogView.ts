@@ -19,6 +19,6 @@ export const updateBlogView = async (req: IGetUserAuthInfoRequest, _: Response, 
   } catch (e) {
     console.error(e);
   } finally {
-    return next()
+    next()
   }
 }

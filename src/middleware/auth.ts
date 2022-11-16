@@ -48,7 +48,7 @@ export const authSoft = (req: IGetUserAuthInfoRequest, res: Response, next: Next
   } catch (e) {
     console.error(e);
   } finally {
-    return next()
+    next()
   }
 }
 
