@@ -114,7 +114,7 @@ export const _getOne = async (id: number) => {
 export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId: number[], skip: number, limit: number }) => {
   try {
 
-    const category = !categoryId ? [1, 2, 3] : categoryId
+    const category = categoryId.length === 0 ? [...new Set(new Array(3).fill(0).map(_ => Math.floor(Math.random() * 5)))] : categoryId
 
     const blogs = await prisma.blogs.findMany({
       skip,
