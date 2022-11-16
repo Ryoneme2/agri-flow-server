@@ -123,6 +123,7 @@ export const _getOneAll = async ({ username }: { username: string }) => {
         username,
       },
       include: {
+        readBlog: true,
         Blogs: {
           include: {
             _count: true

@@ -20,7 +20,8 @@ model Users {
   level        Int     @default(0) // 0 => standard, 1 => premium
   isVerify     Boolean @default(false)
 
-  readBlog UserReadBlog[]
+  readBlog          UserReadBlogPerson[]
+  readBlogCommunity UserReadBlogCommunity[]
 
   create_at DateTime @default(now())
 
@@ -37,14 +38,20 @@ model Users {
   BlogComment          BlogComment[]
 }
 
-model UserReadBlog {
+model UserReadBlogPerson {
   Users         Users?  @relation(fields: [usersUsername], references: [username])
   usersUsername String?
+  Blog          Blogs[]
 
-  blogType String
-  blogId   Int
+  blogId Int @id @default(autoincrement())
+}
 
-  @@id([blogId, blogType])
+model UserReadBlogCommunity {
+  Users         Users?             @relation(fields: [usersUsername], references: [username])
+  usersUsername String?
+  Blog          BlogsOnCommunity[]
+
+  blogId Int @id @default(autoincrement())
 }
 
 model Follows {
@@ -64,9 +71,11 @@ model Blogs {
   title         String
   create_at     DateTime @default(now())
 
-  BlogComment BlogComment[]
-  Category    Category?     @relation(fields: [categoryId], references: [categoryId])
-  categoryId  Int?
+  BlogComment              BlogComment[]
+  Category                 Category?           @relation(fields: [categoryId], references: [categoryId])
+  categoryId               Int?
+  UserReadBlogPerson       UserReadBlogPerson? @relation(fields: [userReadBlogPersonBlogId], references: [blogId])
+  userReadBlogPersonBlogId Int?
 }
 
 model Category {
@@ -107,9 +116,11 @@ model BlogsOnCommunity {
   title            String
   create_at        DateTime  @default(now())
 
-  BlogComment        BlogCommunityComment[]
-  Category           Category?              @relation(fields: [categoryCategoryId], references: [categoryId])
-  categoryCategoryId Int?
+  BlogComment                 BlogCommunityComment[]
+  Category                    Category?              @relation(fields: [categoryCategoryId], references: [categoryId])
+  categoryCategoryId          Int?
+  UserReadBlogCommunity       UserReadBlogCommunity? @relation(fields: [userReadBlogCommunityBlogId], references: [blogId])
+  userReadBlogCommunityBlogId Int?
 }
 
 model BlogComment {
