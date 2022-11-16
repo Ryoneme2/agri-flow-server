@@ -114,12 +114,18 @@ export const _getOne = async (id: number) => {
 export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId: number[], skip: number, limit: number }) => {
   try {
 
-    const blogs = await prisma.blogsOnCommunity.findMany({
+    const category = !categoryId ? [1, 2, 3] : categoryId
+
+    const blogs = await prisma.blogs.findMany({
       skip,
       take: limit,
       where: {
-        categoryCategoryId: {
-          in: categoryId
+        category: {
+          some: {
+            categoryId: {
+              in: category
+            }
+          }
         }
       },
       include: {
@@ -128,7 +134,7 @@ export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId
             username: true,
           }
         },
-        Category: true
+        category: true
       }
     })
 

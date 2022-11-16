@@ -123,10 +123,20 @@ export const _getOneAll = async ({ username }: { username: string }) => {
         username,
       },
       include: {
-        readBlog: true,
+        readBlog: {
+          include: {
+            Blog: {
+              include: {
+                _count: true,
+                category: true
+              }
+            }
+          }
+        },
         Blogs: {
           include: {
-            _count: true
+            _count: true,
+            category: true
           }
         },
         BlogsOnCommunity: {

@@ -14,7 +14,7 @@ import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import moment from 'moment';
 import { client } from '@config/redisConnect';
-import { _getOne } from '@service/user-service';
+import { _getOne, _getOneAll } from '@service/user-service';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -111,11 +111,17 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
-    const user = await _getOne({ username: userObjJWT.username })
+    const user = await _getOneAll({ username: userObjJWT.username })
 
     if (!user.data) return res.sendStatus(httpStatus.unauthorized)
 
+    const categoryUser = user.data.readBlog.map(rb => rb.Blog.map(b => b.category.map(c => c.categoryId))).flat().flat()
+    const blogs = await blogService._getList({ categoryId: categoryUser })
 
+
+
+
+    res.sendStatus(httpStatus.notImplemented)
 
   } catch (e) {
     console.error(e);

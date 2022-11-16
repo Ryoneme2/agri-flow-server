@@ -71,19 +71,27 @@ model Blogs {
   title         String
   create_at     DateTime @default(now())
 
+  category CategoryOnBlogs[] @relation("blog")
+
   BlogComment              BlogComment[]
-  Category                 Category?           @relation(fields: [categoryId], references: [categoryId])
-  categoryId               Int?
   UserReadBlogPerson       UserReadBlogPerson? @relation(fields: [userReadBlogPersonBlogId], references: [blogId])
   userReadBlogPersonBlogId Int?
+}
+
+model CategoryOnBlogs {
+  blog       Blogs    @relation("blog", fields: [blogUserId], references: [blogId])
+  blogUserId Int
+  Category   Category @relation("Category", fields: [categoryId], references: [categoryId])
+  categoryId Int
+
+  @@id([blogUserId, categoryId])
 }
 
 model Category {
   categoryId   Int    @id @default(autoincrement())
   categoryName String
 
-  blog          Blogs[]
-  blogCommunity BlogsOnCommunity[]
+  following CategoryOnBlogs[] @relation("Category")
 }
 
 model DiscussPost {
@@ -117,8 +125,6 @@ model BlogsOnCommunity {
   create_at        DateTime  @default(now())
 
   BlogComment                 BlogCommunityComment[]
-  Category                    Category?              @relation(fields: [categoryCategoryId], references: [categoryId])
-  categoryCategoryId          Int?
   UserReadBlogCommunity       UserReadBlogCommunity? @relation(fields: [userReadBlogCommunityBlogId], references: [blogId])
   userReadBlogCommunityBlogId Int?
 }
