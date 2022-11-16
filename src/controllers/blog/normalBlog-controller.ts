@@ -16,6 +16,8 @@ import moment from 'moment';
 import { client } from '@config/redisConnect';
 import { _getOne, _getOneAll } from '@service/user-service';
 import getThumbnail from '@util/getThumbnail';
+import getContent from '@util/getConent';
+import { _getAll } from '@service/category-service';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -116,6 +118,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 
     const categoryUser = user.data.readBlog.map(rb => rb.Blog.category.map(b => b.categoryId)).flat().flat()
     const blogs = await blogService._getList({ categoryId: categoryUser })
+    const allCategoryName = await _getAll()
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
 
@@ -124,19 +127,20 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
         id: b.blogId,
         blogContent: {
           title: b.title,
-          // content: b.content
+          content: getContent(b.content)
         },
-        thumbnail: getThumbnail(b.content)
+        create_at: moment(b.create_at).fromNow(),
+        thumbnail: getThumbnail(b.content),
+        author: {
+          username: b.create_by.username
+        },
+        tag: allCategoryName.data?.find(v => v.categoryId === b.category[0].categoryId) || 'ไม่มีแท็คจร้า',
       }
     })
 
-    console.log(formatBlog, {
-      user
-    });
 
     res.send({
-      formatBlog,
-      categoryUser
+      data: formatBlog,
     })
 
   } catch (e) {
