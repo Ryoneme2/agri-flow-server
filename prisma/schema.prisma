@@ -20,7 +20,7 @@ model Users {
   level        Int     @default(0) // 0 => standard, 1 => premium
   isVerify     Boolean @default(false)
 
-  readBlog Json
+  readBlog UserReadBlog[]
 
   create_at DateTime @default(now())
 
@@ -35,6 +35,16 @@ model Users {
   BlogCommunityComment BlogCommunityComment[]
   DiscussComment       DiscussComment[]
   BlogComment          BlogComment[]
+}
+
+model UserReadBlog {
+  Users         Users?  @relation(fields: [usersUsername], references: [username])
+  usersUsername String?
+
+  blogType String
+  blogId   Int
+
+  @@id([blogId, blogType])
 }
 
 model Follows {
