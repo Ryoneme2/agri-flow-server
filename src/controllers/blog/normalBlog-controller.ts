@@ -15,6 +15,7 @@ import { decodePassword } from '@util/DecryptEncryptString';
 import moment from 'moment';
 import { client } from '@config/redisConnect';
 import { _getOne, _getOneAll } from '@service/user-service';
+import getThumbnail from '@util/getThumbnail';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -44,10 +45,12 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   }
 }
 
-const getOneBlog = async (req: Request, res: Response) => {
+const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     const { blogId } = req.params
+
+    const userObjJWT = req.jwtObject as UserJwtPayload;
 
     if (isNaN(+blogId)) return res.status(httpStatus.badRequest).send({
       msg: 'blog id is invalid'
@@ -58,9 +61,13 @@ const getOneBlog = async (req: Request, res: Response) => {
 
     const blog = await blogService._getOne(+blogId)
 
-    if (!blog.success) return res.status(httpStatus.conflict).send(blog)
+    if (!blog.success) return res.status(httpStatus.internalServerError).send(blog)
 
     if (!blog.data) return res.send({ msg: 'no blog found' })
+
+    // if (userObjJWT !== undefined) {
+
+    // }
 
     const format = {
       blogContent: {
@@ -115,18 +122,32 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 
     if (!user.data) return res.sendStatus(httpStatus.unauthorized)
 
-    const categoryUser = user.data.readBlog.map(rb => rb.Blog.map(b => b.category.map(c => c.categoryId))).flat().flat()
+    const categoryUser = user.data.readBlog.map(rb => rb.Blog.category.map(b => b.categoryId)).flat().flat()
     const blogs = await blogService._getList({ categoryId: categoryUser })
 
+    if (!blogs.data) return res.send({ msg: 'no blog found' })
 
+    const formatBlog = blogs.data.map(b => {
+      return {
+        id: b.blogId,
+        blogContent: {
+          title: b.title,
+          // content: b.content
+        },
+        thumbnail: getThumbnail(b.content)
+      }
+    })
 
+    console.log(formatBlog);
 
-    res.sendStatus(httpStatus.notImplemented)
+    res.send({
+      formatBlog,
+      categoryUser
+    })
 
   } catch (e) {
     console.error(e);
-
-
+    res.sendStatus(httpStatus.internalServerError)
   }
 }
 

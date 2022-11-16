@@ -20,7 +20,7 @@ model Users {
   level        Int     @default(0) // 0 => standard, 1 => premium
   isVerify     Boolean @default(false)
 
-  readBlog          UserReadBlogPerson[]
+  readBlog          UserReadBlogPerson[]    @relation("readBy")
   readBlogCommunity UserReadBlogCommunity[]
 
   create_at DateTime @default(now())
@@ -39,11 +39,12 @@ model Users {
 }
 
 model UserReadBlogPerson {
-  Users         Users?  @relation(fields: [usersUsername], references: [username])
-  usersUsername String?
-  Blog          Blogs[]
+  Users         Users  @relation("readBy", fields: [usersUsername], references: [username])
+  usersUsername String
+  Blog          Blogs  @relation("readTo", fields: [BlogId], references: [blogId])
+  BlogId        Int
 
-  blogId Int @id @default(autoincrement())
+  @@id([usersUsername, BlogId])
 }
 
 model UserReadBlogCommunity {
@@ -71,11 +72,10 @@ model Blogs {
   title         String
   create_at     DateTime @default(now())
 
-  category CategoryOnBlogs[] @relation("blog")
+  readBlog UserReadBlogPerson[] @relation("readTo")
+  category CategoryOnBlogs[]    @relation("blog")
 
-  BlogComment              BlogComment[]
-  UserReadBlogPerson       UserReadBlogPerson? @relation(fields: [userReadBlogPersonBlogId], references: [blogId])
-  userReadBlogPersonBlogId Int?
+  BlogComment BlogComment[]
 }
 
 model CategoryOnBlogs {
