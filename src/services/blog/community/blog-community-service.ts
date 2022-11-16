@@ -114,11 +114,11 @@ export const _getOne = async (id: number) => {
 export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId: number[], skip: number, limit: number }) => {
   try {
 
-    const blogs = await prisma.blogs.findMany({
+    const blogs = await prisma.blogsOnCommunity.findMany({
       skip,
       take: limit,
       where: {
-        categoryId: {
+        categoryCategoryId: {
           in: categoryId
         }
       },
@@ -143,7 +143,7 @@ export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId
     return {
       success: false,
       data: null,
-      msg: 'internal error on get person blog list'
+      msg: 'internal error on get community blog list'
     }
   }
 }

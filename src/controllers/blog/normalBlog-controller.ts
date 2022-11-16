@@ -14,6 +14,7 @@ import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import moment from 'moment';
 import { client } from '@config/redisConnect';
+import { _getOne } from '@service/user-service';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -23,9 +24,7 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
     }
 
     if (!req.jwtObject) return res.send({
-      status: httpStatus.unauthorized,
-      data: null,
-      message: 'Access denied unauthorized.'
+      msg: 'Access denied unauthorized.'
     })
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
@@ -103,10 +102,20 @@ const getOneBlog = async (req: Request, res: Response) => {
   }
 }
 
-const getListBlog = (req: IGetUserAuthInfoRequest, res: Response) => {
+const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
-    const type = !req.query.type ? 'suggest' : req.query.type
+    if (!req.jwtObject) return res.send({
+      msg: 'Access denied unauthorized.'
+    })
+
+    const userObjJWT = req.jwtObject as UserJwtPayload;
+
+    const user = await _getOne({ username: userObjJWT.username })
+
+    if (!user.data) return res.sendStatus(httpStatus.unauthorized)
+
+
 
   } catch (e) {
     console.error(e);
@@ -118,5 +127,5 @@ const getListBlog = (req: IGetUserAuthInfoRequest, res: Response) => {
 export {
   newBlog,
   getOneBlog,
-  getListBlog
+  getSuggestListBlog
 }

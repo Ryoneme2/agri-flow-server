@@ -73,7 +73,8 @@ model Category {
   categoryId   Int    @id @default(autoincrement())
   categoryName String
 
-  blog Blogs[]
+  blog          Blogs[]
+  blogCommunity BlogsOnCommunity[]
 }
 
 model DiscussPost {
@@ -106,7 +107,9 @@ model BlogsOnCommunity {
   title            String
   create_at        DateTime  @default(now())
 
-  BlogComment BlogCommunityComment[]
+  BlogComment        BlogCommunityComment[]
+  Category           Category?              @relation(fields: [categoryCategoryId], references: [categoryId])
+  categoryCategoryId Int?
 }
 
 model BlogComment {
