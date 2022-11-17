@@ -106,6 +106,11 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
+    const { skip, limit } = req.query
+
+    const xSkip = !skip ? 0 : skip
+    const xLimit = !limit ? 3 : limit
+
     if (!req.jwtObject) return res.send({
       msg: 'Access denied unauthorized.'
     })

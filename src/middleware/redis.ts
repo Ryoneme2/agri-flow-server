@@ -4,8 +4,6 @@ import { httpStatus } from '@config/http'
 
 export const cacheByParam = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // await connectClient()
-
     const params = Object.entries(req.params)
 
     if (!params) return next()
