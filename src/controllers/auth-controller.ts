@@ -201,7 +201,13 @@ const resetPasswordRequest = async (req: Request, res: Response) => {
       expiresIn: 1000 * 60 * 60 * 2 // 2 hour
     })
 
-    const host = process.env.NODE_ENV === 'develop' ? 'http://localhost:3000' : 'https://agri-flow-client.vercel.app/login/reset-password'
+    const host = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://agri-flow-client.vercel.app/login/reset-password'
+
+    const user = await userService._getOneMail({ mail: email })
+
+    if (!user.data) return res.status(httpStatus.unauthorized).send({
+      msg: 'no user found check our email again'
+    })
 
     const mail = await sendMail.forgetPass(email, `${host}?token=${token}`)
 
