@@ -108,7 +108,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 
     const { skip, limit } = req.query
 
-    const xSkip = !skip ? 0 : +skip.toString()
+    // const xSkip = !skip ? 0 : +skip.toString()
     const xLimit = !limit ? 3 : +limit.toString()
 
     if (!req.jwtObject) return res.send({
@@ -122,7 +122,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
     if (!user.data) return res.sendStatus(httpStatus.unauthorized)
 
     const categoryUser = user.data.readBlog.map(rb => rb.Blog.category.map(b => b.categoryId)).flat().flat()
-    const blogs = await blogService._getList({ categoryId: categoryUser, skip: xSkip, limit: xLimit })
+    const blogs = await blogService._getListSuggest({ categoryId: categoryUser, limit: xLimit })
     const allCategoryName = await _getAll()
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
