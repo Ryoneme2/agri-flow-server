@@ -22,7 +22,11 @@ const getListCategory = async (req: Request, res: Response) => {
 
     const categories = await cateService._getAll(xLimit)
 
-    if (!categories.success) return res.status(httpStatus.internalServerError).send({ msg: categories.msg })
+    if (!categories.success || !categories.data) return res.status(httpStatus.internalServerError).send({ msg: categories.msg })
+
+    if (limit) {
+      client.setEx(`categories-limit-${limit}`, 3600, JSON.stringify(categories.data))
+    }
 
     res.send({ data: categories.data, msg: 'success' })
 

@@ -30,23 +30,26 @@ export const cacheByParam = async (req: Request, res: Response, next: NextFuncti
 export const cacheByQuery = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const query = Object.entries(req.query)
-    console.log(url.pathToFileURL);
+    const type = req.originalUrl.split('/')[req.originalUrl.split('/').length - 1].split('?')[0]
 
-    // if (!params) return next()
+    console.log(type);
 
-    // const key = params.map(([k, v]) => `${k}-${v}`).join('')
+    if (!type) return next()
 
-    // const value = await client.get(key)
+    const key = query.map(([k, v]) => {
+      console.log(`${type}-${k}-${v}`);
+      return `${type}-${k}-${v}`
+    }).join('')
 
-    // if (value === null) return next()
+    const value = await client.get(key)
 
-    // return res.status(httpStatus.ok).send({
-    //   cached: true,
-    //   data: JSON.parse(value),
-    //   msg: 'success get data'
-    // })
-    next()
+    if (value === null) return next()
 
+    return res.status(httpStatus.ok).send({
+      cached: true,
+      data: JSON.parse(value),
+      msg: 'success get data'
+    })
   } catch (e) {
     console.error(e);
     return res.sendStatus(httpStatus.internalServerError)
