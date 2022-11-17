@@ -108,8 +108,8 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 
     const { skip, limit } = req.query
 
-    const xSkip = !skip ? 0 : skip
-    const xLimit = !limit ? 3 : limit
+    const xSkip = !skip ? 0 : +skip.toString()
+    const xLimit = !limit ? 3 : +limit.toString()
 
     if (!req.jwtObject) return res.send({
       msg: 'Access denied unauthorized.'
@@ -122,7 +122,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
     if (!user.data) return res.sendStatus(httpStatus.unauthorized)
 
     const categoryUser = user.data.readBlog.map(rb => rb.Blog.category.map(b => b.categoryId)).flat().flat()
-    const blogs = await blogService._getList({ categoryId: categoryUser })
+    const blogs = await blogService._getList({ categoryId: categoryUser, skip: xSkip, limit: xLimit })
     const allCategoryName = await _getAll()
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
