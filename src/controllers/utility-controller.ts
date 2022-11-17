@@ -24,7 +24,7 @@ const getListCategory = async (req: Request, res: Response) => {
 
     if (!categories.success) return res.status(httpStatus.internalServerError).send({ msg: categories.msg })
 
-    res.send({ data: categories, msg: 'success' })
+    res.send({ data: categories.data, msg: 'success' })
 
   } catch (e) {
     console.error(e);
