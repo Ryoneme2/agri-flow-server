@@ -44,7 +44,7 @@ export const authSoft = (req: IGetUserAuthInfoRequest, res: Response, next: Next
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as UserJwtPayload;
     req.jwtObject = decoded;
-    return next()
+    next()
   } catch (e) {
     console.error(e);
     return next()
