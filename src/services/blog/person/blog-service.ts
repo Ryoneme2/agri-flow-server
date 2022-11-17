@@ -127,7 +127,7 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
         }
       }
     })
-    const skip = Math.floor(Math.random() * blogCount);
+    const skip = blogCount >= limit * 2 ? Math.floor(Math.random() * blogCount) - limit : blogCount
     console.log(skip);
     console.log({ category });
 
