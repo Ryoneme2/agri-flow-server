@@ -47,8 +47,7 @@ export const authSoft = (req: IGetUserAuthInfoRequest, res: Response, next: Next
     req.jwtObject = decoded;
   } catch (e) {
     console.error(e);
-  } finally {
-    next()
+    return next()
   }
 }
 

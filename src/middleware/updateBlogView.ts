@@ -16,9 +16,9 @@ export const updateBlogView = async (req: IGetUserAuthInfoRequest, _: Response, 
 
     await blogService._updateView({ username: userObjJWT.username, blogId: +blogId });
 
+    return next()
   } catch (e) {
     console.error(e);
-  } finally {
-    next()
+    return next()
   }
 }

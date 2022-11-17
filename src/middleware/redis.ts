@@ -21,10 +21,9 @@ export const cacheByParam = async (req: Request, res: Response, next: NextFuncti
       data: JSON.parse(value),
       msg: 'success get data'
     })
+
   } catch (e) {
     console.error(e);
     return res.sendStatus(httpStatus.internalServerError)
-  } finally {
-    // await quitClient()
   }
 }
