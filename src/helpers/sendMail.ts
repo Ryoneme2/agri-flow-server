@@ -34,6 +34,7 @@ async function sendMail({ to, subject, context }) {
         clientId: cred.clientId,
         clientSecret: cred.clientSecret,
         refreshToken: cred.refreshToken,
+        expires: 1000 * 60 * 60 * 24 * 30
       },
     });
 
