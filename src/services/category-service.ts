@@ -44,9 +44,15 @@ export const _getById = async (cateId: number[]) => {
   }
 }
 
-export const _getAll = async () => {
+export const _getAll = async (rawLimit?: number) => {
   try {
-    const cate = await prisma.category.findMany({})
+    const cateCount = await prisma.category.count()
+
+    const limit = !rawLimit ? cateCount : rawLimit
+
+    const cate = await prisma.category.findMany({
+      take: limit
+    })
 
     return {
       success: true,
