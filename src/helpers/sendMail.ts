@@ -20,21 +20,18 @@ async function sendMail({ to, subject, context }) {
     }
     const res = await axios.post<TokenResponse>(tokenProviderUrl, data)
 
-    console.log(res.data);
-
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        // ข้อมูลการเข้าสู่ระบบ
         type: "OAuth2",
         user: "worknarair6@gmail.com", // email user
         accessToken: res.data.access_token, // email password
         clientId: cred.clientId,
         clientSecret: cred.clientSecret,
         refreshToken: cred.refreshToken,
-        expires: 1000 * 60 * 60 * 24 * 30
+        // expires: 1000 * 60 * 60 * 24 * 30
       },
     });
 
