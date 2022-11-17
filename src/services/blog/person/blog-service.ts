@@ -131,8 +131,6 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
     const ableSkip = blogCount - limit < 0 ? 0 : blogCount - limit
 
     const skip = Math.floor(Math.random() * ableSkip)
-    console.log({ ableSkip });
-    console.log({ category });
 
     const blogs = await prisma.blogs.findMany({
       skip,

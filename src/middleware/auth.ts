@@ -26,7 +26,6 @@ const auth = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) =
     next();
   } catch (e) {
     console.error(e);
-
     return res.status(httpStatus.internalServerError).send({
       msg: 'internal error'
     })
