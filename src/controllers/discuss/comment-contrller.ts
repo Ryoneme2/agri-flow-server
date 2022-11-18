@@ -33,3 +33,36 @@ export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
     return res.sendStatus(httpStatus.internalServerError)
   }
 }
+
+export const getCommentByPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    res.sendStatus(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+export const editComment = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    res.sendStatus(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+export const deleteComment = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    res.sendStatus(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
