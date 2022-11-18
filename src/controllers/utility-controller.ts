@@ -16,16 +16,20 @@ import { client, connectClient, quitClient } from '@config/redisConnect'
 const getListCategory = async (req: Request, res: Response) => {
   try {
 
-    const { limit } = req.query
+    const { limit, char } = req.query
 
     const xLimit = typeof limit?.toString() === 'string' ? +(limit.toString()) : undefined
 
-    const categories = await cateService._getAll(xLimit)
+    const categories = await cateService._getAll(xLimit, char?.toString())
 
     if (!categories.success || !categories.data) return res.status(httpStatus.internalServerError).send({ msg: categories.msg })
 
     if (limit) {
-      client.setEx(`categories-limit-${limit}`, 3600, JSON.stringify(categories.data))
+      const key = Object.entries(req.query).map(([k, v]) => {
+        return `${'categories'}-${k}-${v}`
+      }).join('-')
+
+      client.setEx(key, 3600, JSON.stringify(categories.data))
     }
 
     res.send({ data: categories.data, msg: 'success' })

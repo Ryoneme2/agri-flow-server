@@ -39,7 +39,9 @@ export const cacheByQuery = async (req: Request, res: Response, next: NextFuncti
     const key = query.map(([k, v]) => {
       console.log(`${type}-${k}-${v}`);
       return `${type}-${k}-${v}`
-    }).join('')
+    }).join('-')
+
+    console.log({ key });
 
     const value = await client.get(key)
 

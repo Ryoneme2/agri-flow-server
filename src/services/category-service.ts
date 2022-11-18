@@ -44,14 +44,19 @@ export const _getById = async (cateId: number[]) => {
   }
 }
 
-export const _getAll = async (rawLimit?: number) => {
+export const _getAll = async (rawLimit?: number, char?: string) => {
   try {
     const cateCount = await prisma.category.count()
 
     const limit = !rawLimit ? cateCount : rawLimit
 
     const cate = await prisma.category.findMany({
-      take: limit
+      take: limit,
+      where: {
+        categoryName: {
+          startsWith: char
+        }
+      }
     })
 
     return {
