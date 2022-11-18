@@ -53,7 +53,9 @@ const _getCommentByBlogId = async ({ blogId, optional = {} }: {
       include: {
         comment_by: {
           select: {
-            username: true
+            username: true,
+            imageProfile: true,
+            isVerify: true,
           }
         }
       },

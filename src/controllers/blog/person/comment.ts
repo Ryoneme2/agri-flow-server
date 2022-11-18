@@ -65,7 +65,9 @@ export const getBlogComment = async (req: Request, res: Response) => {
       return {
         id: cmt.id,
         author: {
-          username: cmt.comment_by.username
+          username: cmt.comment_by.username,
+          imageProfile: cmt.comment_by.imageProfile,
+          isVerify: cmt.comment_by.isVerify
         },
         comment: {
           content: cmt.context
