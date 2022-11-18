@@ -27,6 +27,7 @@ const myApp = async () => {
   app.use('/api/v1/blogs', routes.blogRoute)
   app.use('/api/v1/users', routes.userRoute)
   app.use('/api/v1/utilities', routes.utils)
+  app.use('/api/v1/discusses', routes.discuss)
 
   app.use('/api/v1/test', routes.test)
 

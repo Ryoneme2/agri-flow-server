@@ -77,3 +77,14 @@ export const newCommentSchema: SchemaObject = {
   ],
   additionalProperties: false
 }
+
+export const newPostDiscussSchema: SchemaObject = {
+  type: "object",
+  properties: {
+    content: { type: "string" },
+  },
+  required: [
+    "content",
+  ],
+  additionalProperties: false
+}
