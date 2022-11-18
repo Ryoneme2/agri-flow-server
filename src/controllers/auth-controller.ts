@@ -143,6 +143,10 @@ const signInWithEmail = async (req: Request, res: Response) => {
     res.send({
       data: {
         token,
+        user: {
+          imageProfile: user.data.imageProfile,
+          username: user.data.username
+        }
       }
     })
 
