@@ -43,7 +43,8 @@ export const newPostSchema: SchemaObject = {
   type: "object",
   properties: {
     title: { type: "string", minLength: 1 },
-    content: { type: "string", minLength: 1 }
+    content: { type: "string", minLength: 1 },
+    categories: { type: "array", uniqueItems: true }
   },
   required: [
     "title",

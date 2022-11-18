@@ -13,10 +13,20 @@ dotenv.config();
 
 const prisma = new P.PrismaClient();
 
-export const _add = async ({ author, title, content }: { author: string, title: string, content: string }) => {
+export const _add = async ({ author, title, content, categories }: { author: string, title: string, content: string, categories?: string[] }) => {
   try {
 
-    const splitContent = content.split('src="')
+    const categoriesId = (await prisma.category.findMany({
+      where: {
+        categoryName: {
+          in: categories
+        }
+      },
+      select: {
+        categoryId: true
+      }
+    })).map(v => v.categoryId)
+
     const splitContentLastWord = content.split('"')
 
     console.log(splitContentLastWord);
@@ -40,7 +50,8 @@ export const _add = async ({ author, title, content }: { author: string, title: 
       return `${links.data.path}"`
     }).join('')
 
-    await prisma.blogs.create({
+
+    const blogs = await prisma.blogs.create({
       data: {
         create_by: {
           connect: {
@@ -50,6 +61,12 @@ export const _add = async ({ author, title, content }: { author: string, title: 
         content: context,
         title
       }
+    })
+
+    await prisma.categoryOnBlogs.createMany({
+      data: categoriesId.map(c => {
+        return { categoryId: c, blogUserId: blogs.blogId }
+      })
     })
 
     return {

@@ -17,8 +17,16 @@ const prisma = new P.PrismaClient();
 export const _add = async (categoryName: string) => {
   try {
 
+    const cate = await prisma.category.findFirst({
+      take: 1,
+      orderBy: {
+        categoryId: 'desc'
+      }
+    })
+
     await prisma.category.create({
       data: {
+        categoryId: (cate?.categoryId || 9999) + 1,
         categoryName
       }
     })
