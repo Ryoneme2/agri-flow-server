@@ -21,7 +21,7 @@ export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) =>
 
     const data = req.body as {
       content: string
-      blogId: number,
+      blogId: string,
     }
 
     if (!req.jwtObject) return res.send({
@@ -34,7 +34,7 @@ export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) =>
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    const response = await _add({ content: data.content, blogId: data.blogId, author: userObjJWT.username })
+    const response = await _add({ content: data.content, blogId: +data.blogId, author: userObjJWT.username })
 
     if (!response.success) return res.status(httpStatus.internalServerError).send({ msg: response.msg })
 
