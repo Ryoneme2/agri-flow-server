@@ -148,8 +148,44 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
   }
 }
 
+const getListUserBlog = async (req: Request, res: Response) => {
+  try {
+
+    res.sendStatus(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+const getListCategoryBlog = async (req: Request, res: Response) => {
+  try {
+
+    res.sendStatus(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    res.sendStatus(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
 export {
   newBlog,
   getOneBlog,
-  getSuggestListBlog
+  getSuggestListBlog,
+  getListUserBlog,
+  getListCategoryBlog,
+  getListFollowingBlog
 }
