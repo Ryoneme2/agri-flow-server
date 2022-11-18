@@ -24,7 +24,7 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const data = req.body as {
       title: string,
       content: string
-      category: string[]
+      categories: string[]
     }
 
     if (!req.jwtObject) return res.send({
@@ -37,7 +37,7 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    const response = await blogService._add({ author: userObjJWT.username, title: data.title, content: data.content })
+    const response = await blogService._add({ author: userObjJWT.username, title: data.title, content: data.content, categories: data.categories })
 
     if (!response.success) return res.status(httpStatus.badRequest).send(response)
 
