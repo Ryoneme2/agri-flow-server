@@ -13,4 +13,6 @@ route.get('/p/:blogId', authSoft, updateBlogView, redis.cacheByParam, controller
 route.get('/p', authSoft, controller.blogPerson.blog.getSuggestListBlog)
 route.get('/p/tag/:categoryId', controller.blogPerson.blog.getListCategoryBlog)
 
+route.get('/p/comments/:blogId', controller.blogPerson.comment.getBlogComment)
+
 export default route

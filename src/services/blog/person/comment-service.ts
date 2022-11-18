@@ -3,6 +3,7 @@ import * as P from '@prisma/client';
 import dotenv from 'dotenv';
 
 import defaultValue from '@config/defaultValue';
+import { nil } from 'ajv';
 
 dotenv.config();
 
@@ -33,6 +34,51 @@ const _add = async ({ content, blogId, author }: { content: string, blogId: numb
   }
 }
 
+const _getCommentByBlogId = async ({ blogId, optional = {} }: {
+  blogId: number,
+  optional?: {
+    limit?: number,
+    skip?: number,
+    order?: 'desc' | 'asc'
+  }
+}) => {
+  try {
+
+    const res = await prisma.blogComment.findMany({
+      take: optional.limit,
+      skip: optional.skip,
+      where: {
+        blogsBlogId: blogId,
+      },
+      include: {
+        comment_by: {
+          select: {
+            username: true
+          }
+        }
+      },
+      orderBy: {
+        create_at: optional.order && 'desc'
+      }
+    })
+
+    return {
+      success: true,
+      data: res,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error when try to get comment by id (service)'
+    }
+  }
+}
+
 export {
-  _add
+  _add,
+  _getCommentByBlogId
 }

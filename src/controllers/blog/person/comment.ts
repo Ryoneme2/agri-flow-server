@@ -14,7 +14,7 @@ import moment from 'moment';
 import { client } from '@config/redisConnect';
 import { _getOne, _getOneAll } from '@service/user-service';
 import { _getAll, _getById } from '@service/category-service';
-import { _add } from '@service/blog/person/comment-service';
+import { _add, _getCommentByBlogId } from '@service/blog/person/comment-service';
 
 export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -42,6 +42,45 @@ export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) =>
 
   } catch (error) {
     console.error(error)
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+export const getBlogComment = async (req: Request, res: Response) => {
+  try {
+
+    const { blogId } = req.params
+    const { limit, skip } = req.query
+
+    const comments = await _getCommentByBlogId({
+      blogId: +blogId, optional: {
+        limit: !limit ? undefined : +limit.toString(),
+        skip: !skip ? undefined : +skip.toString()
+      }
+    })
+
+    if (!comments.success) return res.status(httpStatus.internalServerError).send({ msg: comments.msg })
+
+    const format = comments.data?.map(cmt => {
+      return {
+        id: cmt.id,
+        author: {
+          username: cmt.comment_by.username
+        },
+        comment: {
+          content: cmt.context
+        },
+        create_at: moment(cmt.create_at).fromNow()
+      }
+    })
+
+    res.send({
+      data: format || [],
+      msg: ''
+    })
+
+  } catch (e) {
+    console.error(e);
     return res.sendStatus(httpStatus.internalServerError)
   }
 }
