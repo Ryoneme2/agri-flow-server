@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt'
 import axios, { AxiosError } from 'axios'
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken'
@@ -40,6 +41,24 @@ const getListCategory = async (req: Request, res: Response) => {
   }
 }
 
+const newCategory = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    const { context } = req.body
+
+    const response = await cateService._add(context)
+
+    if (!response.success) throw new Error(response.msg)
+
+    res.sendStatus(httpStatus.created)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
 export {
-  getListCategory
+  getListCategory,
+  newCategory
 }

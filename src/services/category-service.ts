@@ -14,6 +14,31 @@ dotenv.config();
 
 const prisma = new P.PrismaClient();
 
+export const _add = async (categoryName: string) => {
+  try {
+
+    await prisma.category.create({
+      data: {
+        categoryName
+      }
+    })
+
+    return {
+      success: true,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on add category service'
+    }
+
+
+  }
+}
+
 export const _getById = async (cateId: number[]) => {
   try {
 

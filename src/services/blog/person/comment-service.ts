@@ -3,7 +3,6 @@ import * as P from '@prisma/client';
 import dotenv from 'dotenv';
 
 import defaultValue from '@config/defaultValue';
-import { nil } from 'ajv';
 
 dotenv.config();
 
