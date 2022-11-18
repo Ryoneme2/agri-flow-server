@@ -20,8 +20,6 @@ const auth = (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) =
         msg: 'Access denied.',
       });
 
-    console.log(token);
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as UserJwtPayload;
     req.jwtObject = decoded;
 

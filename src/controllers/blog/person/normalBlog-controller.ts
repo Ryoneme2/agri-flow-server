@@ -24,6 +24,7 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const data = req.body as {
       title: string,
       content: string
+      category: string[]
     }
 
     if (!req.jwtObject) return res.send({
