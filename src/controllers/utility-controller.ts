@@ -11,7 +11,7 @@ import * as schema from '@model/ajvSchema'
 import * as cateService from '@service/category-service'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
-import { client, connectClient, quitClient } from '@config/redisConnect'
+import { client } from '@config/redisConnect'
 
 const getListCategory = async (req: Request, res: Response) => {
   try {

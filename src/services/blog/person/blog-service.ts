@@ -172,6 +172,52 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
   }
 }
 
+export const _getListByCategory = async ({ tagId, limit = 3, skip = 0 }: {
+  tagId: number,
+  limit?: number,
+  skip?: number
+}) => {
+  try {
+
+    const res = await prisma.blogs.findMany({
+      skip,
+      take: limit,
+      where: {
+        category: {
+          every: {
+            categoryId: tagId
+          }
+        }
+      },
+      include: {
+        create_by: {
+          select: {
+            username: true,
+          }
+        },
+        category: true
+      },
+      orderBy: {
+        create_at: 'desc'
+      }
+    })
+
+    return {
+      data: res,
+      success: true,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on get list by category service'
+    }
+
+  }
+}
+
 export const _updateView = async ({ username, blogId }: { username: string, blogId: number }) => {
   try {
 

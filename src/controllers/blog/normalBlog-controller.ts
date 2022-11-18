@@ -162,7 +162,38 @@ const getListUserBlog = async (req: Request, res: Response) => {
 const getListCategoryBlog = async (req: Request, res: Response) => {
   try {
 
-    res.sendStatus(httpStatus.notImplemented)
+    const { skip, limit } = req.query
+    const { categoryId } = req.params
+
+    const xLimit = !limit ? 3 : +limit.toString()
+    const xSkip = !skip ? 3 : +skip.toString()
+
+    const blogs = await blogService._getListByCategory({ tagId: +categoryId, limit: xLimit, skip: xSkip })
+
+    const allCategoryName = await _getAll()
+
+    if (!blogs.data) return res.send({ msg: 'no blog found' })
+
+    const formatBlog = blogs.data.map(b => {
+      return {
+        id: b.blogId,
+        blogContent: {
+          title: b.title,
+          content: getContent(b.content)
+        },
+        create_at: moment(b.create_at).fromNow(),
+        thumbnail: getThumbnail(b.content),
+        author: {
+          username: b.create_by.username
+        },
+        tag: allCategoryName.data?.find(v => v.categoryId === b.category[0].categoryId) || 'ไม่มีแท็คจร้า',
+      }
+    })
+
+    res.send({
+      data: formatBlog,
+      msg: 'success'
+    })
 
   } catch (e) {
     console.error(e);
