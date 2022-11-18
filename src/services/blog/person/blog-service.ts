@@ -1,4 +1,3 @@
-import { httpStatus } from '@config/http';
 import moment from 'moment';
 import * as P from '@prisma/client';
 import dotenv from 'dotenv';

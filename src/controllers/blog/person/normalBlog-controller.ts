@@ -17,7 +17,7 @@ import { client } from '@config/redisConnect';
 import { _getOne, _getOneAll } from '@service/user-service';
 import getThumbnail from '@util/getThumbnail';
 import getContent from '@util/getConent';
-import { _getAll } from '@service/category-service';
+import { _getAll, _getById } from '@service/category-service';
 
 const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -170,7 +170,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
 
     const blogs = await blogService._getListByCategory({ tagId: +categoryId, limit: xLimit, skip: xSkip })
 
-    const allCategoryName = await _getAll()
+    const allCategoryName = await _getById([+categoryId])
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
 
@@ -186,7 +186,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
         author: {
           username: b.create_by.username
         },
-        tag: allCategoryName.data?.find(v => v.categoryId === b.category[0].categoryId) || 'ไม่มีแท็คจร้า',
+        tag: allCategoryName.data,
       }
     })
 

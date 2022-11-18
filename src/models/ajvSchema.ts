@@ -64,3 +64,16 @@ export const resetPassword: SchemaObject = {
   ],
   additionalProperties: false
 }
+
+export const newCommentSchema: SchemaObject = {
+  type: "object",
+  properties: {
+    content: { type: "string" },
+    blogId: { type: "string" }
+  },
+  required: [
+    "content",
+    "blogId"
+  ],
+  additionalProperties: false
+}
