@@ -61,6 +61,8 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
     })
 
     const blog = await blogService._getOne(+blogId)
+    const blogCategories = blog?.data?.category.map(c => c.categoryId) || []
+    const categories = (await _getById(blogCategories)).data || []
 
     if (!blog.success) return res.status(httpStatus.internalServerError).send(blog)
 
@@ -71,6 +73,7 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
         title: blog.data.title,
         content: blog.data.content
       },
+      categories,
       create_at: moment(blog.data.create_at).fromNow(),
       comments: blog.data.BlogComment.map(comment => {
         return {

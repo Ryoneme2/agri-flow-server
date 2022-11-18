@@ -102,6 +102,7 @@ export const _getOne = async (id: number) => {
             }
           }
         },
+        category: true,
         BlogComment: {
           include: {
             comment_by: true
