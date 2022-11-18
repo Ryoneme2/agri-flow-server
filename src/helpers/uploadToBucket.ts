@@ -38,6 +38,7 @@ const uploadToBucket = async (fileName: string, folder: 'avatar' | 'blog' | 'com
 const helper = {
   avatar: async (fileName: string, file: Buffer | ArrayBufferLike | string, mimtype = 'image/png') => uploadToBucket(fileName, 'avatar', file, 'image-bucket', mimtype),
   blog: async (fileName: string, file: Buffer | ArrayBufferLike | string, mimtype = 'image/png') => uploadToBucket(fileName, 'blog', file, 'image-bucket', mimtype),
+  discuss: async (fileName: string, file: Buffer | ArrayBufferLike | string, mimtype = 'image/png') => uploadToBucket(fileName, 'discuss', file, 'image-bucket', mimtype),
 }
 
 export default helper

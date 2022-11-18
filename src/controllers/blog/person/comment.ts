@@ -30,7 +30,7 @@ export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) =>
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
-    const { success, msg } = validateSchema(schema.newPostSchema, data)
+    const { success, msg } = validateSchema(schema.newCommentSchema, data)
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
