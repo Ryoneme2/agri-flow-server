@@ -3,10 +3,7 @@ import * as P from '@prisma/client';
 import dotenv from 'dotenv';
 import { v4 } from 'uuid';
 
-import { hashString, decodePassword } from '@util/DecryptEncryptString';
 import uploadToBucket from '@helper/uploadToBucket';
-import storageClient from '@config/connectBucket';
-import defaultValue from '@config/defaultValue';
 import { stringToArrayBuffer } from '@util/base64ToBuffer';
 
 dotenv.config();
@@ -237,6 +234,46 @@ export const _getListByCategory = async ({ tagId, limit = 3, skip = 0 }: {
       success: false,
       msg: 'internal error on get list by category service'
     }
+
+  }
+}
+
+export const _getListByFollowing = async ({ author }: { author: string }) => {
+  try {
+
+    const followingList = (await prisma.follows.findMany({
+      where: {
+        following: {
+          username: author
+        }
+      }
+    })).map(v => v.followerUser)
+
+    console.log({ followingList });
+
+    const blogsList = await prisma.blogs.findMany({
+      where: {
+        create_by: {
+          username: {
+            in: followingList
+          }
+        }
+      }
+    })
+
+    return {
+      success: true,
+      data: blogsList,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on get list by following'
+    }
+
 
   }
 }

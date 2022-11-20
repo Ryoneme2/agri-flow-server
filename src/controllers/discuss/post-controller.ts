@@ -100,6 +100,17 @@ export const getSuggestPost = async (req: IGetUserAuthInfoRequest, res: Response
   }
 }
 
+export const getFollowPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    res.sendStatus(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
 export const editPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 

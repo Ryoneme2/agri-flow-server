@@ -161,6 +161,7 @@ const getListUserBlog = async (req: Request, res: Response) => {
   }
 }
 
+
 const getListCategoryBlog = async (req: Request, res: Response) => {
   try {
 
@@ -206,7 +207,11 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
 const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
-    res.sendStatus(httpStatus.notImplemented)
+    const userObjJWT = req.jwtObject as UserJwtPayload;
+
+    const blogListResponse = await blogService._getListByFollowing({ author: userObjJWT.username })
+
+    res.send(blogListResponse)
 
   } catch (e) {
     console.error(e);

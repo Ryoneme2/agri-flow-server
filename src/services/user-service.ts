@@ -40,20 +40,20 @@ export const _add = async ({ username, password, email, imageProfile = defaultVa
       // The .code property can be accessed in a type-safe manner
       if (error.code === 'P2002') {
         return {
-          isOk: false,
+          success: false,
           data: {},
           msg: `username is already taken`,
         };
       }
       return {
-        isOk: false,
+        success: false,
         data: {},
         msg: 'Internal Server Error register service',
       };
     }
 
     return {
-      isOk: false,
+      success: false,
       data: {},
       msg: 'Internal Server Error register service',
     };
@@ -216,11 +216,24 @@ export const _addFollow = async ({ who, author }: { who: string, author: string 
 
   } catch (e) {
     console.error(e);
+    if (e instanceof P.Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (e.code === 'P2003') {
+        return {
+          success: false,
+          data: {},
+          msg: `user are not found`,
+        };
+      }
+      return {
+        success: false,
+        data: {},
+        msg: 'Internal Server Error register service',
+      };
+    }
     return {
       success: false,
       msg: 'internal error add follower'
     }
-
-
   }
 }

@@ -46,13 +46,19 @@ const follow = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     const { username } = req.body
 
-    const valid = validateSchema(schema.loginSchema, { username })
+    const valid = validateSchema(schema.follow, { username })
 
     if (!valid.success) return res.status(httpStatus.badRequest).send({ msg: valid.msg })
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
-    await userService._addFollow({ who: username, author: userObjJWT.username })
+    if (username === userObjJWT.username) return res.status(httpStatus.badRequest).send({
+      msg: 'can not follow yourself'
+    })
+
+    const response = await userService._addFollow({ who: username, author: userObjJWT.username })
+
+    if (!response.success) return res.status(httpStatus.badRequest).send({ msg: response.msg })
 
     res.sendStatus(httpStatus.created)
 
