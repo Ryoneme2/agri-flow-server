@@ -7,6 +7,7 @@ import uploadToBucket from '@helper/uploadToBucket';
 import storageClient from '@config/connectBucket';
 import defaultValue from '@config/defaultValue';
 import { stringToArrayBuffer } from '@util/base64ToBuffer';
+import sharp from 'sharp'
 
 dotenv.config();
 
@@ -15,21 +16,35 @@ const prisma = new P.PrismaClient();
 export const _add = async (data: {
   author: string,
   content: string,
-  file: Express.Multer.File,
+  file: Express.Multer.File | undefined,
 }) => {
   try {
     const uniqueString = v4();
 
-    await uploadToBucket.discuss(uniqueString, data.file.buffer, data.file.mimetype)
+    /* A function that takes the image and resize it to 750px and then it will composite the image with
+    the background color of the image. */
+    // const semiTransparentRedPng = await sharp()
+    //   .resize(750)
+    //   .composite([{
+    //     input: data.file?.buffer,
+    //     blend: 'dest-in'
+    //   }])
+    //   .png().toBuffer()
+
+    const fileRes = data.file ? await uploadToBucket.discuss(uniqueString, data.file.buffer, data?.file.mimetype) : {
+      path: null
+    }
 
     const result = await prisma.discussPost.create({
       data: {
         usersUsername: data.author,
-
+        content: data.content,
+        File: fileRes.path
       },
     });
+
     return {
-      isOk: true,
+      success: true,
       data: result,
       msg: 'create success',
     };
@@ -37,7 +52,7 @@ export const _add = async (data: {
     console.log(e);
 
     return {
-      isOk: false,
+      success: false,
       msg: 'internal error on add post service',
     };
   } finally {

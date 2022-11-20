@@ -8,7 +8,7 @@
     "wts": "tsc --watch",
     "start": "NODE_PATH=./dist node dist/server.js",
     "build": "tsc --project tsconfig.json && npx tsc-alias -p tsconfig.json",
-    "dev": "nodemon src/server.ts",
+    "dev": "nodemon --trace-warnings src/server.ts",
     "lint": "tslint -c tslint.json 'src/**/*.ts'",
     "prepare": "husky install",
     "generateUml": "npx prisma-uml ./prisma/schema.prisma -o png -f ./database/uml/uml.png",

@@ -13,6 +13,7 @@ import * as userService from '@service/user-service'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import { client } from '@config/redisConnect'
+import { _add } from '@service/discuss/post';
 
 export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -25,7 +26,11 @@ export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    res.sendStatus(httpStatus.notImplemented)
+    const response = await _add({ author: userObjJWT.username, content: body.content, file })
+
+    if (!response.success) return res.sendStatus(httpStatus.internalServerError)
+
+    res.sendStatus(httpStatus.created)
 
   } catch (e) {
     console.error(e);
