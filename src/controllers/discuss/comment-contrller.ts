@@ -15,7 +15,7 @@ import { decodePassword } from '@util/DecryptEncryptString';
 import { client } from '@config/redisConnect'
 
 
-export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
+export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     const bodyData = req.body

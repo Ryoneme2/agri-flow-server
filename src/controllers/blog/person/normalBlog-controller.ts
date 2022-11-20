@@ -95,8 +95,6 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
       }
     }
 
-    // await connectClient()
-
     await client.setEx(`blogId-${blogId}`, 3600, JSON.stringify(format))
 
     return res.send({ data: format })
