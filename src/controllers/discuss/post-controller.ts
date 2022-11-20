@@ -17,11 +17,11 @@ import { client } from '@config/redisConnect'
 export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
-    const bodyData = req.body
+    const { body, file } = req
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
-    const { success, msg } = validateSchema(schema.newPostDiscussSchema, bodyData)
+    const { success, msg } = validateSchema(schema.newPostDiscussSchema, body)
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 

@@ -95,10 +95,13 @@ model Category {
 }
 
 model DiscussPost {
-  dcpId         Int      @id @default(autoincrement())
-  create_by     Users    @relation(fields: [usersUsername], references: [username])
+  dcpId         Int     @id @default(autoincrement())
+  create_by     Users   @relation(fields: [usersUsername], references: [username])
   usersUsername String
-  create_at     DateTime @default(now())
+  content       String
+  File          String?
+
+  create_at DateTime @default(now())
 
   DiscussComment DiscussComment[]
 }
@@ -153,7 +156,7 @@ model BlogCommunityComment {
 
 model DiscussComment {
   id        Int      @id @default(autoincrement())
-  content   String
+  context   String
   create_at DateTime @default(now())
 
   dicuss_by        Users       @relation(fields: [usersUsername], references: [username])

@@ -9,3 +9,4 @@ export interface UserJwtPayload extends JwtPayload {
 export interface IGetUserAuthInfoRequest extends Request {
   jwtObject?: string | JwtPayload;
 }
+

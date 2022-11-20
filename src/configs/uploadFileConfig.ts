@@ -10,7 +10,7 @@ export const upload = multer({
     if (!file.originalname.match(/\.(jpg|jpeg|png|webp|JPG|PNG)$/)) {
       return cb(new Error('Please upload an image'));
     }
-    cb(undefined, true); // call back function to check any error
+    cb(null, true); // call back function to check any error
   },
 });
 

@@ -12,18 +12,20 @@ dotenv.config();
 
 const prisma = new P.PrismaClient();
 
-const _add = async (data : {
-  author : string,
-  file : Buffer,
+export const _add = async (data: {
+  author: string,
+  content: string,
+  file: Express.Multer.File,
 }) => {
   try {
     const uniqueString = v4();
 
-    await uploadToBucket.discuss(uniqueString, data.file)
+    await uploadToBucket.discuss(uniqueString, data.file.buffer, data.file.mimetype)
 
     const result = await prisma.discussPost.create({
       data: {
-        usersUsername : data.author
+        usersUsername: data.author,
+
       },
     });
     return {
