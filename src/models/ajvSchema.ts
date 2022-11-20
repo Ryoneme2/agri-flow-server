@@ -100,3 +100,14 @@ export const follow: SchemaObject = {
   ],
   additionalProperties: false
 }
+
+export const newGroupSchema: SchemaObject = {
+  type: "object",
+  properties: {
+    name: { type: "string" },
+  },
+  required: [
+    "name",
+  ],
+  additionalProperties: false
+}

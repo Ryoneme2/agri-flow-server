@@ -23,13 +23,15 @@ model Users {
   readBlog          UserReadBlogPerson[]    @relation("readBy")
   readBlogCommunity UserReadBlogCommunity[]
 
+  community Community[]
+
   create_at DateTime @default(now())
 
   followedBy Follows[] @relation("follower")
   following  Follows[] @relation("following")
 
+  Community        UserInCommunity[]
   likeBy           LikeBy[]
-  Community        Community[]
   Blogs            Blogs[]
   DiscussPost      DiscussPost[]
   BlogsOnCommunity BlogsOnCommunity[]
@@ -58,7 +60,7 @@ model UserReadBlogCommunity {
 
 model Follows {
   follower      Users  @relation("follower", fields: [followerUser], references: [username])
-  followerUser  String 
+  followerUser  String
   following     Users  @relation("following", fields: [followingUser], references: [username])
   followingUser String
 
@@ -97,13 +99,6 @@ model CategoryOnDiscuss {
   @@id([postId, categoryId])
 }
 
-// model CategoryPost {
-//   categoryId   Int    @id @default(autoincrement())
-//   categoryName String
-
-//   following CategoryOnDiscuss[]
-// }
-
 model Category {
   categoryId   Int    @id @default(autoincrement())
   categoryName String
@@ -127,15 +122,26 @@ model DiscussPost {
   DiscussComment DiscussComment[]
 }
 
-model Community {
-  commuId       String   @id @default(cuid())
-  name          String
-  popularity    Int
-  create_by     Users    @relation(fields: [usersUsername], references: [username])
-  usersUsername String
-  create_at     DateTime @default(now())
+model UserInCommunity {
+  Users     Users     @relation(fields: [username], references: [username])
+  username  String
+  Community Community @relation(fields: [commuId], references: [commuId])
+  commuId   String
 
+  @@id([username, commuId])
+}
+
+model Community {
+  commuId        String   @id @default(cuid())
+  name           String
+  communityImage String   @default("https://thumbs.dreamstime.com/z/people-line-icon-team-outline-logo-illustration-linear-pictogram-isolated-white-90235968.jpg")
+  create_at      DateTime @default(now())
+
+  users            UserInCommunity[]
   BlogsOnCommunity BlogsOnCommunity[]
+
+  UserCreate Users?  @relation(fields: [create_by], references: [username])
+  create_by  String?
 }
 
 model BlogsOnCommunity {

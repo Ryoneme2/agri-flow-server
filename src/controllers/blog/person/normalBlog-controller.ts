@@ -139,7 +139,6 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
       }
     })
 
-
     res.send({
       data: formatBlog,
     })
@@ -161,7 +160,6 @@ const getListUserBlog = async (req: Request, res: Response) => {
   }
 }
 
-
 const getListCategoryBlog = async (req: Request, res: Response) => {
   try {
 
@@ -173,7 +171,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
 
     const blogs = await blogService._getListByCategory({ tagId: +categoryId, limit: xLimit, skip: xSkip })
 
-    const allCategoryName = await _getById([+categoryId])
+    const allCategoryName = await _getAll()
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
 
@@ -189,7 +187,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
         author: {
           username: b.create_by.username
         },
-        tag: allCategoryName.data,
+        tag: allCategoryName.data?.find(v => v.categoryId === b.category[0].categoryId) || 'ไม่มีแท็คจร้า',
       }
     })
 
