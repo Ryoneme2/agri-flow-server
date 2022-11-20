@@ -23,7 +23,7 @@ export const newGroup = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     const response = await _addGroup({
       author: userObjJWT.username,
-      file: file,
+      file,
       name: body.name
     })
 
