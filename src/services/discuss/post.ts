@@ -59,3 +59,82 @@ export const _add = async (data: {
     prisma.$disconnect();
   }
 };
+
+export const _getListRecent = async ({
+  limit = 5,
+  skip = 0,
+}) => {
+  try {
+
+    const posts = await prisma.discussPost.findMany({
+      take: limit,
+      skip,
+      include: {
+        create_by: {
+          select: {
+            username: true,
+            isVerify: true,
+            imageProfile: true
+          }
+        },
+        DiscussComment: {
+          include: {
+            dicuss_by: {
+              select: {
+                username: true,
+                imageProfile: true,
+                isVerify: true
+              }
+            },
+            discuss_at: true,
+          }
+        }
+      },
+      orderBy: {
+        create_at: 'desc'
+      }
+    })
+
+    return {
+      success: true,
+      data: posts,
+      msg: ''
+    }
+
+  } catch (e) {
+    return {
+      success: false,
+      msg: 'internal error on get list recent'
+    }
+  }
+}
+
+export const _deletePost = async (postId: number) => {
+  try {
+
+    await prisma.$transaction([
+      prisma.discussComment.deleteMany({
+        where: {
+          discussPostDcpId: postId
+        }
+      }),
+      prisma.discussPost.delete({
+        where: {
+          dcpId: postId
+        }
+      })
+    ])
+
+    return {
+      success: true,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on delete post service'
+    }
+  }
+}

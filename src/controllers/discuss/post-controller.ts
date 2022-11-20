@@ -1,3 +1,4 @@
+import { _getListRecent } from './../../services/discuss/post';
 import type { Request, Response } from 'express';
 import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt';
 import axios, { AxiosError } from 'axios'
@@ -41,7 +42,46 @@ export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
 export const getRecentPost = async (req: Request, res: Response) => {
   try {
 
-    res.sendStatus(httpStatus.notImplemented)
+    const { limit, skip } = req.query
+
+    const posts = await _getListRecent({ limit: +(limit?.toString() || '5'), skip: +(skip?.toString() || '0') })
+
+    if (!posts.success) return res.sendStatus(httpStatus.internalServerError).send({
+      msg: posts.msg
+    })
+
+    const format = posts.data?.map(post => {
+      return {
+        id: post.dcpId,
+        post: {
+          content: post.content,
+          file: post.File
+        },
+        author: {
+          username: post.create_by.username,
+          isVerify: post.create_by.isVerify,
+          imageProfile: post.create_by.imageProfile
+        },
+        create_at: post.create_at,
+        comments: post.DiscussComment.map(comment => {
+          return {
+            id: comment.id,
+            content: comment.context,
+            commenter: {
+              username: comment.dicuss_by.username,
+              isVerify: comment.dicuss_by.isVerify,
+              imageProfile: comment.dicuss_by.imageProfile
+            },
+            create_at: comment.discuss_at
+          }
+        })
+      }
+    })
+
+    res.send({
+      data: format,
+      msg: ''
+    })
 
   } catch (e) {
     console.error(e);
@@ -73,6 +113,8 @@ export const editPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
 export const deletePost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
+
+    const { postId } = req.params
 
     res.sendStatus(httpStatus.notImplemented)
 
