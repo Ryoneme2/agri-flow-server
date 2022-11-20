@@ -68,9 +68,9 @@ export const getRecentPost = async (req: Request, res: Response) => {
             id: comment.id,
             content: comment.context,
             commenter: {
-              username: comment.dicuss_by.username,
-              isVerify: comment.dicuss_by.isVerify,
-              imageProfile: comment.dicuss_by.imageProfile
+              username: comment.create_by.username,
+              isVerify: comment.create_by.isVerify,
+              imageProfile: comment.create_by.imageProfile
             },
             create_at: comment.discuss_at
           }

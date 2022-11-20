@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import { v4 } from 'uuid';
 
 import uploadToBucket from '@helper/uploadToBucket';
-import storageClient from '@config/connectBucket';
 import defaultValue from '@config/defaultValue';
 import { stringToArrayBuffer } from '@util/base64ToBuffer';
 import sharp from 'sharp'
@@ -79,7 +78,7 @@ export const _getListRecent = async ({
         },
         DiscussComment: {
           include: {
-            dicuss_by: {
+            create_by: {
               select: {
                 username: true,
                 imageProfile: true,

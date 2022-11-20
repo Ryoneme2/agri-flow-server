@@ -28,6 +28,7 @@ model Users {
   followedBy Follows[] @relation("follower")
   following  Follows[] @relation("following")
 
+  likeBy           LikeBy[]
   Community        Community[]
   Blogs            Blogs[]
   DiscussPost      DiscussPost[]
@@ -57,7 +58,7 @@ model UserReadBlogCommunity {
 
 model Follows {
   follower      Users  @relation("follower", fields: [followerUser], references: [username])
-  followerUser  String
+  followerUser  String 
   following     Users  @relation("following", fields: [followingUser], references: [username])
   followingUser String
 
@@ -87,11 +88,28 @@ model CategoryOnBlogs {
   @@id([blogUserId, categoryId])
 }
 
+model CategoryOnDiscuss {
+  Post       DiscussPost @relation(fields: [postId], references: [dcpId])
+  postId     Int
+  Category   Category    @relation(fields: [categoryId], references: [categoryId])
+  categoryId Int
+
+  @@id([postId, categoryId])
+}
+
+// model CategoryPost {
+//   categoryId   Int    @id @default(autoincrement())
+//   categoryName String
+
+//   following CategoryOnDiscuss[]
+// }
+
 model Category {
   categoryId   Int    @id @default(autoincrement())
   categoryName String
 
-  following CategoryOnBlogs[] @relation("Category")
+  following     CategoryOnDiscuss[]
+  followingPost CategoryOnBlogs[]   @relation("Category")
 }
 
 model DiscussPost {
@@ -100,6 +118,9 @@ model DiscussPost {
   usersUsername String
   content       String
   File          String?
+
+  likeBy   LikeBy[]
+  category CategoryOnDiscuss[]
 
   create_at DateTime @default(now())
 
@@ -159,8 +180,17 @@ model DiscussComment {
   context   String
   create_at DateTime @default(now())
 
-  dicuss_by        Users       @relation(fields: [usersUsername], references: [username])
+  create_by        Users       @relation(fields: [usersUsername], references: [username])
   usersUsername    String
   discuss_at       DiscussPost @relation(fields: [discussPostDcpId], references: [dcpId])
   discussPostDcpId Int
+}
+
+model LikeBy {
+  Posts    DiscussPost? @relation(fields: [postsId], references: [dcpId])
+  postsId  Int
+  Users    Users?       @relation(fields: [username], references: [username])
+  username String
+
+  @@id([username, postsId])
 }

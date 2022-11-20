@@ -89,3 +89,14 @@ export const newPostDiscussSchema: SchemaObject = {
   ],
   additionalProperties: false
 }
+
+export const follow: SchemaObject = {
+  type: "object",
+  properties: {
+    username: { type: "string" },
+  },
+  required: [
+    "username",
+  ],
+  additionalProperties: false
+}

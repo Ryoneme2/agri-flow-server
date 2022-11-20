@@ -198,3 +198,29 @@ export const _updatePassByEmail = async ({ email, pass }: { email: string, pass:
 
   }
 }
+
+export const _addFollow = async ({ who, author }: { who: string, author: string }) => {
+  try {
+
+    await prisma.follows.create({
+      data: {
+        followingUser: author,
+        followerUser: who
+      }
+    })
+
+    return {
+      success: true,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error add follower'
+    }
+
+
+  }
+}

@@ -7,12 +7,13 @@ dotenv.config()
 import { httpStatus } from '@config/http';
 import defaultValue from '@config/defaultValue';
 import { validateSchema } from '@helper/validateSchema';
-import * as schema from '@model/ajvSchema'
-import * as userService from '@service/user-service'
-import { Prisma } from '@prisma/client'
+import * as schema from '@model/ajvSchema';
+import * as userService from '@service/user-service';
+import { Prisma } from '@prisma/client';
 import { decodePassword } from '@util/DecryptEncryptString';
-import { client, connectClient, quitClient } from '@config/redisConnect'
+import { client, connectClient, quitClient } from '@config/redisConnect';
 import sendEmail from '@helper/sendMail';
+import { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt';
 
 const getOne = async (req: Request, res: Response) => {
   try {
@@ -40,7 +41,29 @@ const getOne = async (req: Request, res: Response) => {
   }
 }
 
+const follow = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    const { username } = req.body
+
+    const valid = validateSchema(schema.loginSchema, { username })
+
+    if (!valid.success) return res.status(httpStatus.badRequest).send({ msg: valid.msg })
+
+    const userObjJWT = req.jwtObject as UserJwtPayload;
+
+    await userService._addFollow({ who: username, author: userObjJWT.username })
+
+    res.sendStatus(httpStatus.created)
+
+  } catch (e) {
+    return res.sendStatus(httpStatus.internalServerError)
+
+  }
+}
+
 
 export {
-  getOne
+  getOne,
+  follow
 }

@@ -1079,7 +1079,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@prisma/client@^4.0.0":
+"@prisma/client@^4.6.1":
   version "4.6.1"
   resolved "https://registry.yarnpkg.com/@prisma/client/-/client-4.6.1.tgz#e8e1d347ecbff44158d21b6591bb99650c8503a8"
   integrity sha512-M1+NNrMzqaOIxT7PBGcTs3IZo7d1EW/+gVQd4C4gUgWBDGgD9AcIeZnUSidgWClmpMSgVUdnVORjsWWGUameYA==
