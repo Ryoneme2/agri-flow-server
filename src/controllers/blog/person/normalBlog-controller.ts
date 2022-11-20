@@ -175,7 +175,10 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
 
+    console.log(allCategoryName.data);
+
     const formatBlog = blogs.data.map(b => {
+      console.log(b.category[0]);
       return {
         id: b.blogId,
         blogContent: {
@@ -187,7 +190,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
         author: {
           username: b.create_by.username
         },
-        tag: allCategoryName.data?.find(v => v.categoryId === b.category[0].categoryId) || 'ไม่มีแท็คจร้า',
+        tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
       }
     })
 
