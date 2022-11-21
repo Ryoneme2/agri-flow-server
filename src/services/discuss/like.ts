@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 export const _update = async ({ postsId, num, username }) => {
   try {
-    num == 1
+    num === 1
       ? await prisma.likeBy.create({
         data: {
           postsId,
@@ -18,8 +18,8 @@ export const _update = async ({ postsId, num, username }) => {
       : await prisma.likeBy.delete({
         where: {
           username_postsId: {
-            username: username,
-            postsId: postsId,
+            username,
+            postsId
           },
         },
       });
