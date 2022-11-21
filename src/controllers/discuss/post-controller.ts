@@ -128,14 +128,17 @@ export const getById = async (req: Request, res: Response) => {
         content: post.data.content,
         image: post.data.File
       },
-      create_at: post.data.create_at,
+      create_at: moment(post.data.create_at).fromNow(),
       comment: post.data.DiscussComment.map(cmt => {
         return {
+          id: cmt.id,
           create_by: {
             username: cmt.create_by.username,
             isVerify: cmt.create_by.isVerify,
             imageProfile: cmt.create_by.imageProfile,
-          }
+          },
+          content: cmt.context,
+          create_at: moment(cmt.create_at).fromNow()
         }
       })
     }
