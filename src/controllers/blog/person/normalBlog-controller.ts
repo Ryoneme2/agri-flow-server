@@ -1,18 +1,14 @@
-import { _getHistoryList } from './../../../services/blog/person/blog-service';
+import { _getHistoryList } from '@service/blog/person/blog-service';
 import type { Response, Request } from 'express';
 import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt'
-import axios, { AxiosError } from 'axios'
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken'
 dotenv.config()
 
 import { httpStatus } from '@config/http';
-import defaultValue from '@config/defaultValue';
 import { validateSchema } from '@helper/validateSchema';
 import * as schema from '@model/ajvSchema'
 import * as blogService from '@service/blog/person/blog-service'
-import { Prisma } from '@prisma/client'
-import { decodePassword } from '@util/DecryptEncryptString';
 import moment from 'moment';
 import { client } from '@config/redisConnect';
 import { _getOne, _getOneAll } from '@service/user-service';
@@ -134,7 +130,9 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          username: b.create_by.username
+          username: b.create_by.username,
+          isVerify: b.create_by.isVerify,
+          imageProfile: b.create_by.imageProfile
         },
         tag: allCategoryName.data?.find(v => v.categoryId === b.category[0].categoryId) || 'ไม่มีแท็คจร้า',
       }
@@ -157,7 +155,42 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 const getListUserBlog = async (req: Request, res: Response) => {
   try {
 
-    res.sendStatus(httpStatus.notImplemented)
+    const { username } = req.params
+
+    const blogs = await blogService._getUserBlogList({ username })
+
+    const allCategoryName = await _getAll()
+
+    if (!blogs.data) return res.send({ msg: 'no blog found' })
+
+    console.log(allCategoryName.data);
+
+    const formatBlog = blogs.data.blogs.map(b => {
+      console.log(b.category[0]);
+      return {
+        id: b.blogId,
+        blogContent: {
+          title: b.title,
+          content: getContent(b.content)
+        },
+        create_at: moment(b.create_at).fromNow(),
+        thumbnail: getThumbnail(b.content),
+        author: {
+          username: b.create_by.username,
+          imageProfile: b.create_by.imageProfile,
+          isVerify: b.create_by.isVerify
+        },
+        tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
+      }
+    })
+
+    res.send({
+      data: formatBlog,
+      pagination: {
+        hasMore: (blogs?.data.blogs.length || 0) <= (blogs?.data?.blogCount || 0),
+      },
+      msg: 'success'
+    })
 
   } catch (e) {
     console.error(e);
@@ -193,7 +226,9 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          username: b.create_by.username
+          username: b.create_by.username,
+          imageProfile: b.create_by.imageProfile,
+          isVerify: b.create_by.isVerify
         },
         tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
       }
@@ -234,7 +269,9 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          username: b.create_by.username
+          username: b.create_by.username,
+          isVerify: b.create_by.isVerify,
+          imageProfile: b.create_by.imageProfile
         },
         tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
       }
@@ -276,7 +313,9 @@ const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          username: b.create_by.username
+          username: b.create_by.username,
+          isVerify: b.create_by.isVerify,
+          imageProfile: b.create_by.imageProfile
         },
         tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
       }

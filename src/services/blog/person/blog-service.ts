@@ -168,6 +168,8 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
         create_by: {
           select: {
             username: true,
+            imageProfile: true,
+            isVerify: true
           }
         },
         category: true
@@ -217,6 +219,8 @@ export const _getListByCategory = async ({ tagId, limit = 3, skip = 0 }: {
           create_by: {
             select: {
               username: true,
+              imageProfile: true,
+              isVerify: true
             }
           },
           category: true
@@ -284,6 +288,8 @@ export const _getListByFollowing = async ({ author }: { author: string }) => {
           create_by: {
             select: {
               username: true,
+              imageProfile: true,
+              isVerify: true
             }
           },
           category: true
@@ -355,6 +361,8 @@ export const _getHistoryList = async ({ author, limit = 3, skip = 0 }: { author:
         create_by: {
           select: {
             username: true,
+            imageProfile: true,
+            isVerify: true
           }
         },
         category: true
@@ -375,6 +383,49 @@ export const _getHistoryList = async ({ author, limit = 3, skip = 0 }: { author:
       success: false,
       data: null,
       msg: 'internal error on get history blog service'
+    }
+  }
+}
+
+export const _getUserBlogList = async ({ username }: { username: string }) => {
+  try {
+
+    const [blogs, blogCount] = await prisma.$transaction([
+      prisma.blogs.findMany({
+        where: {
+          usersUsername: username
+        },
+        include: {
+          create_by: {
+            select: {
+              username: true,
+              imageProfile: true,
+              isVerify: true
+            }
+          },
+          category: true
+        },
+      }),
+      prisma.blogs.count({
+        where: {
+          usersUsername: username
+        },
+      })
+    ])
+
+    return {
+      data: {
+        blogs,
+        blogCount
+      },
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on get blog of each user service'
     }
   }
 }
