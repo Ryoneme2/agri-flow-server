@@ -289,6 +289,42 @@ export const _getListByFollowing = async ({ author }: { author: string }) => {
   }
 }
 
+export const _getHistoryList = async ({ author }: { author: string }) => {
+  try {
+
+    const views = (await prisma.userReadBlogPerson.findMany({
+      where: {
+        usersUsername: author
+      },
+      select: {
+        BlogId: true
+      }
+    })).map(v => v.BlogId)
+
+    const blogs = await prisma.blogs.findMany({
+      where: {
+        blogId: {
+          in: views
+        }
+      }
+    })
+
+    return {
+      success: true,
+      data: blogs,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error on get history blog service'
+    }
+  }
+}
+
 export const _updateView = async ({ username, blogId }: { username: string, blogId: number }) => {
   try {
 

@@ -87,7 +87,7 @@ export const newPostDiscussSchema: SchemaObject = {
   required: [
     "content",
   ],
-  additionalProperties: false
+  additionalProperties: true
 }
 
 export const follow: SchemaObject = {

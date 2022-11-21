@@ -1,3 +1,4 @@
+import { _getHistoryList } from './../../../services/blog/person/blog-service';
 import type { Response, Request } from 'express';
 import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt'
 import axios, { AxiosError } from 'axios'
@@ -237,6 +238,23 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
       data: formatBlog,
       msg: 'success'
     })
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    const { limit, skip } = req.query
+
+    const userObjJWT = req.jwtObject as UserJwtPayload
+
+    const blogs = _getHistoryList({ author: userObjJWT.username })
+
+
 
   } catch (e) {
     console.error(e);
