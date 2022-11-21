@@ -68,6 +68,17 @@ export const _getListRecent = async ({
       take: limit,
       skip,
       include: {
+        likeBy: {
+          select: {
+            Users: {
+              select: {
+                username: true,
+                isVerify: true,
+                imageProfile: true,
+              }
+            }
+          }
+        },
         create_by: {
           select: {
             username: true,

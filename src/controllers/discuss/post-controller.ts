@@ -65,6 +65,15 @@ export const getRecentPost = async (req: Request, res: Response) => {
           content: post.content,
           file: post.File
         },
+        likeCount: post.likeBy.length,
+        likeBy: post.likeBy.map(l => {
+          if (l.Users === null) return
+          return {
+            username: l.Users.username,
+            isVerify: l.Users.isVerify,
+            imageProfile: l.Users.imageProfile,
+          }
+        }),
         author: {
           username: post.create_by.username,
           isVerify: post.create_by.isVerify,
