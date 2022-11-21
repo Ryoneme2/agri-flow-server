@@ -10,12 +10,13 @@ import { httpStatus } from '@config/http';
 import defaultValue from '@config/defaultValue';
 import { validateSchema } from '@helper/validateSchema';
 import * as schema from '@model/ajvSchema'
-import * as userService from '@service/user-service'
+import * as discussService from '@service/discuss'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import { client } from '@config/redisConnect'
 import { _add } from '@service/discuss/post';
 import moment from 'moment';
+import { chmodSync } from 'fs';
 
 export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -93,6 +94,62 @@ export const getRecentPost = async (req: Request, res: Response) => {
   } catch (e) {
     console.error(e);
     return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+export const getById = async (req: Request, res: Response) => {
+  try {
+
+    const { postId } = req.params
+
+    const post = await discussService.post._getOne(+postId)
+
+    if (!post.success) return res.status(httpStatus.internalServerError).send({ msg: post.msg })
+
+    if (!post.data) return res.status(httpStatus.ok).send({ data: [], msg: '' })
+
+    const format = {
+      id: post.data.dcpId,
+      author: {
+        username: post.data.create_by.username,
+        isVerify: post.data.create_by.isVerify,
+        imageProfile: post.data.create_by.imageProfile,
+      },
+      likeCount: post.data.likeBy.length,
+      likeBy: post.data.likeBy.map(l => {
+        if (l.Users === null) return
+        return {
+          username: l.Users.username,
+          isVerify: l.Users.isVerify,
+          imageProfile: l.Users.imageProfile,
+        }
+      }),
+      post: {
+        content: post.data.content,
+        image: post.data.File
+      },
+      create_at: post.data.create_at,
+      comment: post.data.DiscussComment.map(cmt => {
+        return {
+          create_by: {
+            username: cmt.create_by.username,
+            isVerify: cmt.create_by.isVerify,
+            imageProfile: cmt.create_by.imageProfile,
+          }
+        }
+      })
+    }
+
+    res.send({
+      data: format,
+      msg: ''
+    })
+
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+
   }
 }
 

@@ -46,7 +46,5 @@ export const _addGroup = async (data: {
       success: false,
       msg: 'internal error on new group service'
     }
-
-
   }
 }

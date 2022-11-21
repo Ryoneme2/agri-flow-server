@@ -108,6 +108,66 @@ export const _getListRecent = async ({
   }
 }
 
+export const _getOne = async (id: number) => {
+  try {
+
+    const post = await prisma.discussPost.findUnique({
+      where: {
+        dcpId: id
+      },
+      include: {
+        likeBy: {
+          select: {
+            Users: {
+              select: {
+                username: true,
+                isVerify: true,
+                imageProfile: true,
+              }
+            }
+          }
+        },
+        create_by: {
+          select: {
+            username: true,
+            isVerify: true,
+            imageProfile: true,
+          }
+        },
+        category: true,
+        DiscussComment: {
+          include: {
+            create_by: {
+              select: {
+                username: true,
+                isVerify: true,
+                imageProfile: true,
+              }
+            }
+          }
+        }
+      }
+    })
+
+    return {
+      success: true,
+      data: post,
+      msg: '',
+    }
+
+
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error on get one post service'
+    }
+
+  }
+}
+
 export const _deletePost = async (postId: number) => {
   try {
 
