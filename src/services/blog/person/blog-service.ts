@@ -257,7 +257,18 @@ export const _getListByFollowing = async ({ author }: { author: string }) => {
           username: {
             in: followingList
           }
-        }
+        },
+      },
+      include: {
+        create_by: {
+          select: {
+            username: true,
+          }
+        },
+        category: true
+      },
+      orderBy: {
+        create_at: 'desc'
       }
     })
 

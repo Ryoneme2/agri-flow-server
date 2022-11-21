@@ -211,8 +211,32 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
     const blogListResponse = await blogService._getListByFollowing({ author: userObjJWT.username })
+    const allCategoryName = await _getAll()
 
-    res.send(blogListResponse)
+    if (!blogListResponse.success) return res.status(httpStatus.internalServerError).send({ msg: blogListResponse.msg })
+
+    const formatBlog = blogListResponse?.data?.map(b => {
+      console.log(b.category[0]);
+      return {
+        id: b.blogId,
+        blogContent: {
+          title: b.title,
+          content: getContent(b.content)
+        },
+        create_at: moment(b.create_at).fromNow(),
+        thumbnail: getThumbnail(b.content),
+        author: {
+          username: b.create_by.username
+        },
+        tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
+      }
+    }) || []
+
+
+    res.send({
+      data: formatBlog,
+      msg: 'success'
+    })
 
   } catch (e) {
     console.error(e);
