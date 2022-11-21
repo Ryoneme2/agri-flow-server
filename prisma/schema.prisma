@@ -75,6 +75,8 @@ model Blogs {
   title         String
   create_at     DateTime @default(now())
 
+  isSpacial Int @default(0)
+
   readBlog UserReadBlogPerson[] @relation("readTo")
   category CategoryOnBlogs[]    @relation("blog")
 
@@ -85,6 +87,15 @@ model CategoryOnBlogs {
   blog       Blogs    @relation("blog", fields: [blogUserId], references: [blogId])
   blogUserId Int
   Category   Category @relation("Category", fields: [categoryId], references: [categoryId])
+  categoryId Int
+
+  @@id([blogUserId, categoryId])
+}
+
+model CategoryOnBlogsCommunity {
+  blog       BlogsOnCommunity @relation("blogCommu", fields: [blogUserId], references: [blogId])
+  blogUserId Int
+  Category   Category         @relation("CategoryCommu", fields: [categoryId], references: [categoryId])
   categoryId Int
 
   @@id([blogUserId, categoryId])
@@ -103,8 +114,9 @@ model Category {
   categoryId   Int    @id @default(autoincrement())
   categoryName String
 
-  following     CategoryOnDiscuss[]
-  followingPost CategoryOnBlogs[]   @relation("Category")
+  following              CategoryOnDiscuss[]
+  followingPost          CategoryOnBlogs[]          @relation("Category")
+  followingPostCommunity CategoryOnBlogsCommunity[] @relation("CategoryCommu")
 }
 
 model DiscussPost {
@@ -154,8 +166,9 @@ model BlogsOnCommunity {
   title            String
   create_at        DateTime  @default(now())
 
+  category                    CategoryOnBlogsCommunity[] @relation("blogCommu")
   BlogComment                 BlogCommunityComment[]
-  UserReadBlogCommunity       UserReadBlogCommunity? @relation(fields: [userReadBlogCommunityBlogId], references: [blogId])
+  UserReadBlogCommunity       UserReadBlogCommunity?     @relation(fields: [userReadBlogCommunityBlogId], references: [blogId])
   userReadBlogCommunityBlogId Int?
 }
 

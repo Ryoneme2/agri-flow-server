@@ -3,20 +3,27 @@ import * as P from '@prisma/client';
 import dotenv from 'dotenv';
 import { v4 } from 'uuid';
 
-import { hashString, decodePassword } from '@util/DecryptEncryptString';
 import uploadToBucket from '@helper/uploadToBucket';
-import storageClient from '@config/connectBucket';
-import defaultValue from '@config/defaultValue';
 import { stringToArrayBuffer } from '@util/base64ToBuffer';
 
 dotenv.config();
 
 const prisma = new P.PrismaClient();
 
-export const _add = async ({ author, title, content }: { author: string, title: string, content: string }) => {
+export const _add = async ({ author, title, content, categories }: { author: { commuId: string, username: string }, title: string, content: string, categories?: string[] }) => {
   try {
 
-    const splitContent = content.split('src="')
+    const categoriesId = (await prisma.category.findMany({
+      where: {
+        categoryName: {
+          in: categories
+        }
+      },
+      select: {
+        categoryId: true
+      }
+    })).map(v => v.categoryId)
+
     const splitContentLastWord = content.split('"')
 
     console.log(splitContentLastWord);
@@ -40,16 +47,20 @@ export const _add = async ({ author, title, content }: { author: string, title: 
       return `${links.data.path}"`
     }).join('')
 
-    await prisma.blogs.create({
+
+    const blogs = await prisma.blogsOnCommunity.create({
       data: {
-        create_by: {
-          connect: {
-            username: author
-          }
-        },
+        communityCommuId: author.commuId,
+        usersUsername: author.username,
         content: context,
         title
       }
+    })
+
+    await prisma.categoryOnBlogs.createMany({
+      data: categoriesId.map(c => {
+        return { categoryId: c, blogUserId: blogs.blogId }
+      })
     })
 
     return {
@@ -85,6 +96,7 @@ export const _getOne = async (id: number) => {
             }
           }
         },
+        category: true,
         BlogComment: {
           include: {
             comment_by: true
@@ -111,10 +123,31 @@ export const _getOne = async (id: number) => {
   }
 }
 
-export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId: number[], skip: number, limit: number }) => {
+export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: number[], skip?: number, limit?: number }) => {
   try {
+    const shuffle = (array) => {
+      return [...array].sort(() => Math.random() - 0.5);
+    }
 
-    const category = categoryId.length === 0 ? [...new Set(new Array(3).fill(0).map(_ => Math.floor(Math.random() * 5)))] : categoryId
+    const category = categoryId.length === 0 ? [...new Set(new Array(3).fill(0).map(_ => Math.ceil(Math.random() * 9)))] : shuffle(categoryId)
+
+    console.log({ x: [...new Set(category)] });
+
+    const blogCount = await prisma.blogs.count({
+      where: {
+        category: {
+          some: {
+            categoryId: {
+              in: [...new Set(category)]
+            }
+          }
+        }
+      }
+    })
+
+    const ableSkip = blogCount - limit < 0 ? 0 : blogCount - limit
+
+    const skip = Math.floor(Math.random() * ableSkip)
 
     const blogs = await prisma.blogs.findMany({
       skip,
@@ -123,7 +156,7 @@ export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId
         category: {
           some: {
             categoryId: {
-              in: category
+              in: [...new Set(category)]
             }
           }
         }
@@ -132,6 +165,8 @@ export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId
         create_by: {
           select: {
             username: true,
+            imageProfile: true,
+            isVerify: true
           }
         },
         category: true
@@ -140,7 +175,10 @@ export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId
 
     return {
       success: true,
-      data: blogs,
+      data: {
+        blogCount,
+        blogs
+      },
       msg: 'success'
     }
 
@@ -149,7 +187,281 @@ export const _getList = async ({ categoryId, skip = 0, limit = 3 }: { categoryId
     return {
       success: false,
       data: null,
-      msg: 'internal error on get community blog list'
+      msg: 'internal error on get person blog list'
+    }
+  } finally {
+    prisma.$disconnect()
+  }
+}
+
+export const _getListByCategory = async ({ tagId, limit = 3, skip = 0 }: {
+  tagId: number,
+  limit?: number,
+  skip?: number
+}) => {
+  try {
+
+    const [blogs, count] = await prisma.$transaction([
+      prisma.blogs.findMany({
+        skip,
+        take: limit,
+        where: {
+          category: {
+            every: {
+              categoryId: tagId
+            }
+          }
+        },
+        include: {
+          create_by: {
+            select: {
+              username: true,
+              imageProfile: true,
+              isVerify: true
+            }
+          },
+          category: true
+        },
+        orderBy: {
+          create_at: 'desc'
+        }
+      }),
+      prisma.blogs.count({
+        where: {
+          category: {
+            every: {
+              categoryId: tagId
+            }
+          }
+        },
+        orderBy: {
+          create_at: 'desc'
+        }
+      })
+    ])
+
+    return {
+      data: {
+        blogs,
+        count
+      },
+      success: true,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on get list by category service'
+    }
+
+  }
+}
+
+export const _getListByFollowing = async ({ author }: { author: string }) => {
+  try {
+
+    const followingList = (await prisma.follows.findMany({
+      where: {
+        following: {
+          username: author
+        }
+      }
+    })).map(v => v.followerUser)
+
+    console.log({ followingList });
+
+    const [blogs, count] = await prisma.$transaction([
+      prisma.blogs.findMany({
+        where: {
+          create_by: {
+            username: {
+              in: followingList
+            }
+          },
+        },
+        include: {
+          create_by: {
+            select: {
+              username: true,
+              imageProfile: true,
+              isVerify: true
+            }
+          },
+          category: true
+        },
+        orderBy: {
+          create_at: 'desc'
+        }
+      }),
+      prisma.blogs.count({
+        where: {
+          create_by: {
+            username: {
+              in: followingList
+            }
+          },
+        },
+        orderBy: {
+          create_at: 'desc'
+        }
+      })
+    ])
+
+    return {
+      success: true,
+      data: {
+        blogs, count
+      },
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on get list by following'
+    }
+
+
+  }
+}
+
+export const _getHistoryList = async ({ author, limit = 3, skip = 0 }: { author: string, limit: number, skip: number }) => {
+  try {
+
+    const views = (await prisma.userReadBlogPerson.findMany({
+      where: {
+        usersUsername: author
+      },
+      select: {
+        BlogId: true
+      }
+    })).map(v => v.BlogId)
+
+    const [blogCount, blogs] = await prisma.$transaction([prisma.blogs.count({
+      where: {
+        blogId: {
+          in: views
+        }
+      },
+    }), prisma.blogs.findMany({
+      skip,
+      take: limit,
+      where: {
+        blogId: {
+          in: views
+        }
+      },
+      include: {
+        create_by: {
+          select: {
+            username: true,
+            imageProfile: true,
+            isVerify: true
+          }
+        },
+        category: true
+      },
+    })])
+
+
+    return {
+      success: true,
+      data: blogs,
+      count: blogCount,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error on get history blog service'
+    }
+  }
+}
+
+export const _getUserBlogList = async ({ username }: { username: string }) => {
+  try {
+
+    const [blogs, blogCount] = await prisma.$transaction([
+      prisma.blogs.findMany({
+        where: {
+          usersUsername: username
+        },
+        include: {
+          create_by: {
+            select: {
+              username: true,
+              imageProfile: true,
+              isVerify: true
+            }
+          },
+          category: true
+        },
+      }),
+      prisma.blogs.count({
+        where: {
+          usersUsername: username
+        },
+      })
+    ])
+
+    return {
+      data: {
+        blogs,
+        blogCount
+      },
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on get blog of each user service'
+    }
+  }
+}
+
+export const _updateView = async ({ username, blogId }: { username: string, blogId: number }) => {
+  try {
+
+    await prisma.userReadBlogPerson.create({
+      data: {
+        usersUsername: username,
+        BlogId: blogId
+      }
+    })
+
+    return {
+      success: false,
+      msg: 'success'
+    }
+
+  } catch (e) {
+    if (e instanceof P.Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (e.code === 'P2002') {
+        return {
+          isOk: false,
+          data: {},
+          msg: `id is duplicate`,
+        };
+      }
+      return {
+        isOk: false,
+        data: {},
+        msg: 'Internal Server Error register service',
+      };
+    }
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on update user view blog service'
     }
   }
 }

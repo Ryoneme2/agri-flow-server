@@ -111,6 +111,8 @@ export const getById = async (req: Request, res: Response) => {
 
     const { postId } = req.params
 
+    if (!postId || postId === undefined) return res.sendStatus(httpStatus.badRequest)
+
     const post = await discussService.post._getOne(+postId)
 
     if (!post.success) return res.status(httpStatus.internalServerError).send({ msg: post.msg })
