@@ -15,11 +15,18 @@ import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import { client } from '@config/redisConnect'
 import { _add } from '@service/discuss/post';
+import moment from 'moment';
 
 export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
-    const { body, file } = req
+    const { body, file } = req as {
+      body: {
+        content: string,
+        categories?: number[],
+      },
+      file: Express.Multer.File
+    }
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
@@ -27,7 +34,7 @@ export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    const response = await _add({ author: userObjJWT.username, content: body.content, file })
+    const response = await _add({ author: userObjJWT.username, content: body.content, categories: body.categories, file })
 
     if (!response.success) return res.sendStatus(httpStatus.internalServerError)
 
@@ -62,7 +69,7 @@ export const getRecentPost = async (req: Request, res: Response) => {
           isVerify: post.create_by.isVerify,
           imageProfile: post.create_by.imageProfile
         },
-        create_at: post.create_at,
+        create_at: moment(post.create_at).fromNow(),
         comments: post.DiscussComment.map(comment => {
           return {
             id: comment.id,
@@ -72,7 +79,7 @@ export const getRecentPost = async (req: Request, res: Response) => {
               isVerify: comment.create_by.isVerify,
               imageProfile: comment.create_by.imageProfile
             },
-            create_at: comment.discuss_at
+            create_at: moment(comment.discuss_at.create_at).fromNow()
           }
         })
       }

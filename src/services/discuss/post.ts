@@ -15,20 +15,11 @@ const prisma = new P.PrismaClient();
 export const _add = async (data: {
   author: string,
   content: string,
+  categories?: number[] | null,
   file: Express.Multer.File | undefined,
 }) => {
   try {
     const uniqueString = v4();
-
-    /* A function that takes the image and resize it to 750px and then it will composite the image with
-    the background color of the image. */
-    // const semiTransparentRedPng = await sharp()
-    //   .resize(750)
-    //   .composite([{
-    //     input: data.file?.buffer,
-    //     blend: 'dest-in'
-    //   }])
-    //   .png().toBuffer()
 
     const fileRes = data.file ? await uploadToBucket.discuss(uniqueString, data.file.buffer, data?.file.mimetype) : {
       path: null
@@ -41,6 +32,14 @@ export const _add = async (data: {
         File: fileRes.path
       },
     });
+
+    if (data.categories) {
+      await prisma.categoryOnDiscuss.createMany({
+        data: data.categories.map(c => {
+          return { categoryId: c, postId: result.dcpId }
+        })
+      })
+    }
 
     return {
       success: true,
@@ -87,7 +86,8 @@ export const _getListRecent = async ({
             },
             discuss_at: true,
           }
-        }
+        },
+        category: true
       },
       orderBy: {
         create_at: 'desc'
