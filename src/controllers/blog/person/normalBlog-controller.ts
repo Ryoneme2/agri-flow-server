@@ -251,6 +251,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
 const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
+    if (!req.jwtObject) return res.sendStatus(httpStatus.unauthorized)
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
     const { data, success, msg } = await blogService._getListByFollowing({ author: userObjJWT.username })
@@ -298,8 +299,9 @@ const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     const { limit, skip } = req.query
 
-    const userObjJWT = req.jwtObject as UserJwtPayload
+    if (!req.jwtObject) return res.sendStatus(httpStatus.unauthorized)
 
+    const userObjJWT = req.jwtObject as UserJwtPayload
     const allCategoryName = await _getAll()
     const blogs = await _getHistoryList({ author: userObjJWT.username, limit: +(limit?.toString() || '3'), skip: +(skip?.toString() || '0') })
 

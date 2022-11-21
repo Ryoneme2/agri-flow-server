@@ -11,6 +11,7 @@ const route = express.Router()
 route.post('/p', auth, controller.blogPerson.blog.newBlog)
 route.post('/p/comments', auth, controller.blogPerson.comment.newComment)
 
+route.get('/p/u/:username', redis.cacheByParam, controller.blogPerson.blog.getListUserBlog)
 route.get('/p/:blogId', authSoft, updateBlogView, redis.cacheByParam, controller.blogPerson.blog.getOneBlog)
 route.get('/p', authSoft, (req: IGetUserAuthInfoRequest, res: Response) => {
   const { type } = req.query
@@ -21,6 +22,9 @@ route.get('/p', authSoft, (req: IGetUserAuthInfoRequest, res: Response) => {
       break;
     case 'follow':
       controller.blogPerson.blog.getListFollowingBlog(req, res)
+      break;
+    case 'history':
+      controller.blogPerson.blog.getListHistory(req, res)
       break;
     default:
       controller.blogPerson.blog.getSuggestListBlog(req, res)
