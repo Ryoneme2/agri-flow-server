@@ -1,4 +1,3 @@
-import { _getListRecent } from './../../services/discuss/post';
 import type { Request, Response } from 'express';
 import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt';
 import axios, { AxiosError } from 'axios'
@@ -14,9 +13,8 @@ import * as discussService from '@service/discuss'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import { client } from '@config/redisConnect'
-import { _add } from '@service/discuss/post';
+import { _add, _getListRecent } from '@service/discuss/post';
 import moment from 'moment';
-import { chmodSync } from 'fs';
 
 export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {

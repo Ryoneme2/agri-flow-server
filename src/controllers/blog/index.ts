@@ -1,2 +1,2 @@
-export * as blogCommunity from './communityBlog-controller'
+export * as blogCommunity from './community'
 export * as blogPerson from './person'

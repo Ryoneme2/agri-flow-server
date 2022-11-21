@@ -1,4 +1,4 @@
-import { _getHistoryList } from '@service/blog/person/blog-service';
+import { _getHistoryList } from '@service/blog/community/blog-community-service';
 import type { Response, Request } from 'express';
 import type { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt'
 import dotenv from 'dotenv';
@@ -8,7 +8,7 @@ dotenv.config()
 import { httpStatus } from '@config/http';
 import { validateSchema } from '@helper/validateSchema';
 import * as schema from '@model/ajvSchema'
-import * as blogService from '@service/blog/person/blog-service'
+import * as blogService from '@service/blog/community/blog-community-service'
 import moment from 'moment';
 import { client } from '@config/redisConnect';
 import { _getOne, _getOneAll } from '@service/user-service';
@@ -24,6 +24,8 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
       categories: string[]
     }
 
+    const { communityId } = req.params
+
     if (!req.jwtObject) return res.send({
       msg: 'Access denied unauthorized.'
     })
@@ -34,7 +36,7 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    const response = await blogService._add({ author: userObjJWT.username, title: data.title, content: data.content, categories: data.categories })
+    const response = await blogService._add({ author: { username: userObjJWT.username, commuId: communityId }, title: data.title, content: data.content, categories: data.categories, })
 
     if (!response.success) return res.status(httpStatus.badRequest).send(response)
 
@@ -48,7 +50,7 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
-    const { blogId } = req.params
+    const { blogId, communityId } = req.params
 
     if (isNaN(+blogId)) return res.status(httpStatus.badRequest).send({
       msg: 'blog id is invalid'
@@ -79,6 +81,10 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
           create_at: moment(comment.create_at).fromNow()
         }
       }),
+      create_by: {
+        cName: blog.data.at_community.name,
+        image: blog.data.at_community.communityImage
+      },
       author: {
         username: blog.data.create_by.username,
         imageProfile: blog.data.create_by.imageProfile,
@@ -106,6 +112,8 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
   try {
 
     const { skip, limit } = req.query
+    const { communityId } = req.params
+    if (!communityId) return res.sendStatus(httpStatus.badRequest)
 
     // const xSkip = !skip ? 0 : +skip.toString()
     const xLimit = !limit ? 3 : +limit.toString()
@@ -115,7 +123,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
     const user = await _getOneAll({ username: userObjJWT?.username || '' })
 
     const categoryUser = !user.data ? [] : user.data.readBlog.map(rb => rb.Blog.category.map(b => b.categoryId)).flat().flat()
-    const blogs = await blogService._getListSuggest({ categoryId: categoryUser, limit: xLimit })
+    const blogs = await blogService._getListSuggest({ categoryId: categoryUser, limit: xLimit, communityId })
     const allCategoryName = await _getAll()
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
@@ -152,62 +160,17 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
   }
 }
 
-const getListUserBlog = async (req: Request, res: Response) => {
-  try {
-
-    const { username } = req.params
-
-    const blogs = await blogService._getUserBlogList({ username })
-
-    const allCategoryName = await _getAll()
-
-    if (!blogs.data) return res.send({ msg: 'no blog found' })
-
-    console.log(allCategoryName.data);
-
-    const formatBlog = blogs.data.blogs.map(b => {
-      console.log(b.category[0]);
-      return {
-        id: b.blogId,
-        blogContent: {
-          title: b.title,
-          content: getContent(b.content)
-        },
-        create_at: moment(b.create_at).fromNow(),
-        thumbnail: getThumbnail(b.content),
-        author: {
-          username: b.create_by.username,
-          imageProfile: b.create_by.imageProfile,
-          isVerify: b.create_by.isVerify
-        },
-        tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
-      }
-    })
-
-    res.send({
-      data: formatBlog,
-      pagination: {
-        hasMore: (blogs?.data.blogs.length || 0) <= (blogs?.data?.blogCount || 0),
-      },
-      msg: 'success'
-    })
-
-  } catch (e) {
-    console.error(e);
-    return res.sendStatus(httpStatus.internalServerError)
-  }
-}
-
 const getListCategoryBlog = async (req: Request, res: Response) => {
   try {
 
     const { skip, limit } = req.query
-    const { categoryId } = req.params
+    const { categoryId, communityId } = req.params
+    if (!communityId || !categoryId) return res.sendStatus(httpStatus.badRequest)
 
     const xLimit = !limit ? 3 : +limit.toString()
     const xSkip = !skip ? 3 : +skip.toString()
 
-    const blogs = await blogService._getListByCategory({ tagId: +categoryId, limit: xLimit, skip: xSkip })
+    const blogs = await blogService._getListByCategory({ tagId: +categoryId, limit: xLimit, skip: xSkip, communityId })
 
     const allCategoryName = await _getAll()
 
@@ -248,62 +211,19 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
   }
 }
 
-const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
-  try {
-
-    if (!req.jwtObject) return res.sendStatus(httpStatus.unauthorized)
-    const userObjJWT = req.jwtObject as UserJwtPayload;
-
-    const { data, success, msg } = await blogService._getListByFollowing({ author: userObjJWT.username })
-    const allCategoryName = await _getAll()
-
-    if (!success) return res.status(httpStatus.internalServerError).send({ msg })
-
-    const formatBlog = data?.blogs?.map(b => {
-      console.log(b.category[0]);
-      return {
-        id: b.blogId,
-        blogContent: {
-          title: b.title,
-          content: getContent(b.content)
-        },
-        create_at: moment(b.create_at).fromNow(),
-        thumbnail: getThumbnail(b.content),
-        author: {
-          username: b.create_by.username,
-          isVerify: b.create_by.isVerify,
-          imageProfile: b.create_by.imageProfile
-        },
-        tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
-      }
-    }) || []
-
-
-    res.send({
-      data: formatBlog,
-      pagination: {
-        hasMore: (data?.blogs.length || 0) <= (data?.count || 0),
-        countItems: (data?.count || 0)
-      },
-      msg: 'success'
-    })
-
-  } catch (e) {
-    console.error(e);
-    return res.sendStatus(httpStatus.internalServerError)
-  }
-}
-
 const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     const { limit, skip } = req.query
+    const { communityId } = req.params
+
+    if (!communityId) return res.sendStatus(httpStatus.badRequest)
 
     if (!req.jwtObject) return res.sendStatus(httpStatus.unauthorized)
 
     const userObjJWT = req.jwtObject as UserJwtPayload
     const allCategoryName = await _getAll()
-    const blogs = await _getHistoryList({ author: userObjJWT.username, limit: +(limit?.toString() || '3'), skip: +(skip?.toString() || '0') })
+    const blogs = await _getHistoryList({ communityId, author: userObjJWT.username, limit: +(limit?.toString() || '3'), skip: +(skip?.toString() || '0') })
 
     const formatBlog = blogs?.data?.map(b => {
       return {
@@ -342,8 +262,6 @@ export {
   newBlog,
   getOneBlog,
   getSuggestListBlog,
-  getListUserBlog,
   getListCategoryBlog,
-  getListFollowingBlog,
   getListHistory
 }

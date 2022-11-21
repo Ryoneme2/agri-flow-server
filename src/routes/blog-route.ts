@@ -35,4 +35,30 @@ route.get('/p/tag/:categoryId', controller.blogPerson.blog.getListCategoryBlog)
 
 route.get('/p/comments/:blogId', controller.blogPerson.comment.getBlogComment)
 
+// community blog
+
+route.post('/:communityId', auth, controller.blogCommunity.blog.newBlog)
+route.post('/:communityId/:communityId/comments', auth, controller.blogCommunity.comment.newComment)
+
+route.get('/:communityId/:blogId', authSoft, updateBlogView, redis.cacheByParam, controller.blogCommunity.blog.getOneBlog)
+route.get('/:communityId', authSoft, (req: IGetUserAuthInfoRequest, res: Response) => {
+  const { type } = req.query
+  const xquery = !type ? 'suggest' : type
+  switch (xquery) {
+    case 'suggest':
+      controller.blogCommunity.blog.getSuggestListBlog(req, res)
+      break;
+    case 'history':
+      controller.blogCommunity.blog.getListHistory(req, res)
+      break;
+    default:
+      controller.blogCommunity.blog.getSuggestListBlog(req, res)
+      break;
+  }
+})
+route.get('/:communityId/tag/:categoryId', controller.blogCommunity.blog.getListCategoryBlog)
+
+route.get('/:communityId/comments/:blogId', controller.blogCommunity.comment.getBlogComment)
+
+
 export default route
