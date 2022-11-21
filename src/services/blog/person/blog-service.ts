@@ -176,7 +176,10 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
 
     return {
       success: true,
-      data: blogs,
+      data: {
+        blogCount,
+        blogs
+      },
       msg: 'success'
     }
 
@@ -199,31 +202,48 @@ export const _getListByCategory = async ({ tagId, limit = 3, skip = 0 }: {
 }) => {
   try {
 
-    const res = await prisma.blogs.findMany({
-      skip,
-      take: limit,
-      where: {
-        category: {
-          every: {
-            categoryId: tagId
-          }
-        }
-      },
-      include: {
-        create_by: {
-          select: {
-            username: true,
+    const [blogs, count] = await prisma.$transaction([
+      prisma.blogs.findMany({
+        skip,
+        take: limit,
+        where: {
+          category: {
+            every: {
+              categoryId: tagId
+            }
           }
         },
-        category: true
-      },
-      orderBy: {
-        create_at: 'desc'
-      }
-    })
+        include: {
+          create_by: {
+            select: {
+              username: true,
+            }
+          },
+          category: true
+        },
+        orderBy: {
+          create_at: 'desc'
+        }
+      }),
+      prisma.blogs.count({
+        where: {
+          category: {
+            every: {
+              categoryId: tagId
+            }
+          }
+        },
+        orderBy: {
+          create_at: 'desc'
+        }
+      })
+    ])
 
     return {
-      data: res,
+      data: {
+        blogs,
+        count
+      },
       success: true,
       msg: 'success'
     }
@@ -251,30 +271,46 @@ export const _getListByFollowing = async ({ author }: { author: string }) => {
 
     console.log({ followingList });
 
-    const blogsList = await prisma.blogs.findMany({
-      where: {
-        create_by: {
-          username: {
-            in: followingList
-          }
+    const [blogs, count] = await prisma.$transaction([
+      prisma.blogs.findMany({
+        where: {
+          create_by: {
+            username: {
+              in: followingList
+            }
+          },
         },
-      },
-      include: {
-        create_by: {
-          select: {
-            username: true,
-          }
+        include: {
+          create_by: {
+            select: {
+              username: true,
+            }
+          },
+          category: true
         },
-        category: true
-      },
-      orderBy: {
-        create_at: 'desc'
-      }
-    })
+        orderBy: {
+          create_at: 'desc'
+        }
+      }),
+      prisma.blogs.count({
+        where: {
+          create_by: {
+            username: {
+              in: followingList
+            }
+          },
+        },
+        orderBy: {
+          create_at: 'desc'
+        }
+      })
+    ])
 
     return {
       success: true,
-      data: blogsList,
+      data: {
+        blogs, count
+      },
       msg: ''
     }
 
@@ -289,7 +325,7 @@ export const _getListByFollowing = async ({ author }: { author: string }) => {
   }
 }
 
-export const _getHistoryList = async ({ author }: { author: string }) => {
+export const _getHistoryList = async ({ author, limit = 3, skip = 0 }: { author: string, limit: number, skip: number }) => {
   try {
 
     const views = (await prisma.userReadBlogPerson.findMany({
@@ -301,17 +337,35 @@ export const _getHistoryList = async ({ author }: { author: string }) => {
       }
     })).map(v => v.BlogId)
 
-    const blogs = await prisma.blogs.findMany({
+    const [blogCount, blogs] = await prisma.$transaction([prisma.blogs.count({
       where: {
         blogId: {
           in: views
         }
-      }
-    })
+      },
+    }), prisma.blogs.findMany({
+      skip,
+      take: limit,
+      where: {
+        blogId: {
+          in: views
+        }
+      },
+      include: {
+        create_by: {
+          select: {
+            username: true,
+          }
+        },
+        category: true
+      },
+    })])
+
 
     return {
       success: true,
       data: blogs,
+      count: blogCount,
       msg: ''
     }
 

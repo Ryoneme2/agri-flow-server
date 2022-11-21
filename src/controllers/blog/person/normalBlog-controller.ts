@@ -124,7 +124,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
 
-    const formatBlog = blogs.data.map(b => {
+    const formatBlog = blogs.data.blogs.map(b => {
       return {
         id: b.blogId,
         blogContent: {
@@ -142,6 +142,10 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
 
     res.send({
       data: formatBlog,
+      pagination: {
+        hasMore: (blogs.data.blogs.length || 0) <= (blogs.data?.blogCount || 0),
+        countItems: (blogs.data?.blogCount || 0)
+      }
     })
 
   } catch (e) {
@@ -178,7 +182,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
 
     console.log(allCategoryName.data);
 
-    const formatBlog = blogs.data.map(b => {
+    const formatBlog = blogs.data.blogs.map(b => {
       console.log(b.category[0]);
       return {
         id: b.blogId,
@@ -197,6 +201,9 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
 
     res.send({
       data: formatBlog,
+      pagination: {
+        hasMore: (blogs?.data.blogs.length || 0) <= (blogs?.data?.count || 0),
+      },
       msg: 'success'
     })
 
@@ -211,12 +218,12 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
-    const blogListResponse = await blogService._getListByFollowing({ author: userObjJWT.username })
+    const { data, success, msg } = await blogService._getListByFollowing({ author: userObjJWT.username })
     const allCategoryName = await _getAll()
 
-    if (!blogListResponse.success) return res.status(httpStatus.internalServerError).send({ msg: blogListResponse.msg })
+    if (!success) return res.status(httpStatus.internalServerError).send({ msg })
 
-    const formatBlog = blogListResponse?.data?.map(b => {
+    const formatBlog = data?.blogs?.map(b => {
       console.log(b.category[0]);
       return {
         id: b.blogId,
@@ -236,6 +243,10 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
 
     res.send({
       data: formatBlog,
+      pagination: {
+        hasMore: (data?.blogs.length || 0) <= (data?.count || 0),
+        countItems: (data?.count || 0)
+      },
       msg: 'success'
     })
 
@@ -252,9 +263,33 @@ const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     const userObjJWT = req.jwtObject as UserJwtPayload
 
-    const blogs = _getHistoryList({ author: userObjJWT.username })
+    const allCategoryName = await _getAll()
+    const blogs = await _getHistoryList({ author: userObjJWT.username, limit: +(limit?.toString() || '3'), skip: +(skip?.toString() || '0') })
 
+    const formatBlog = blogs?.data?.map(b => {
+      return {
+        id: b.blogId,
+        blogContent: {
+          title: b.title,
+          content: getContent(b.content)
+        },
+        create_at: moment(b.create_at).fromNow(),
+        thumbnail: getThumbnail(b.content),
+        author: {
+          username: b.create_by.username
+        },
+        tag: (allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
+      }
+    }) || []
 
+    res.send({
+      data: formatBlog,
+      pagination: {
+        hasMore: (blogs.count || 0) >= (blogs.data?.length || 0),
+        countItems: blogs.count || 0
+      },
+      msg: ''
+    })
 
   } catch (e) {
     console.error(e);
@@ -268,5 +303,6 @@ export {
   getSuggestListBlog,
   getListUserBlog,
   getListCategoryBlog,
-  getListFollowingBlog
+  getListFollowingBlog,
+  getListHistory
 }
