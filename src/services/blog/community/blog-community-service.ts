@@ -83,7 +83,7 @@ export const _add = async ({ author, title, content, categories }: { author: { c
       }
     })
 
-    await prisma.categoryOnBlogs.createMany({
+    await prisma.categoryOnBlogsCommunity.createMany({
       data: categoriesId.map(c => {
         return { categoryId: c, blogUserId: blogs.blogId }
       })
