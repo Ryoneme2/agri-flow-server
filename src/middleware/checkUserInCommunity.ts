@@ -25,7 +25,9 @@ export const checkUserInCommunity = async (req: IGetUserAuthInfoRequest, res: Re
       }
     })
 
-    if (user === null) return res.sendStatus(httpStatus.forbidden)
+    if (user === null) return res.status(httpStatus.forbidden).send({
+      msg: 'you are not in this community'
+    })
 
     return next()
   } catch (e) {

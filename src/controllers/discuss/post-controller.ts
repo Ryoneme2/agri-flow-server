@@ -143,7 +143,7 @@ export const getById = async (req: Request, res: Response) => {
         image: post.data.File
       },
       create_at: moment(post.data.create_at).fromNow(),
-      comment: post.data.DiscussComment.map(cmt => {
+      comments: post.data.DiscussComment.map(cmt => {
         return {
           id: cmt.id,
           create_by: {
