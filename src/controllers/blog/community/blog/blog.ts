@@ -20,7 +20,8 @@ const newBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
     const data = req.body as {
       title: string,
-      content: string
+      content: string,
+      isPublic?: boolean,
       categories: string[]
     }
 

@@ -75,7 +75,7 @@ model Blogs {
   title         String
   create_at     DateTime @default(now())
 
-  isSpacial Int @default(0)
+  isSpacial Int @default(0) // <== 1 = blog is locked
 
   readBlog UserReadBlogPerson[] @relation("readTo")
   category CategoryOnBlogs[]    @relation("blog")

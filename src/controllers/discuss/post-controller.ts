@@ -77,6 +77,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
             imageProfile: l.Users.imageProfile,
           }
         }),
+        tag: post.category,
         author: {
           username: post.create_by.username,
           isVerify: post.create_by.isVerify,
