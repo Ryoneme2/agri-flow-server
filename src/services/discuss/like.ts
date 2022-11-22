@@ -6,7 +6,7 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-export const _update = async ({ postsId, num, username }) => {
+export const _update = async ({ postsId, num, username }: { postsId: number, num: number, username: string }) => {
   try {
     num === 1
       ? await prisma.likeBy.create({

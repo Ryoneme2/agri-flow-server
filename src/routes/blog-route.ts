@@ -5,6 +5,7 @@ import auth, { authSoft } from '@middleware/auth'
 import * as redis from '@middleware/redis'
 import { updateBlogView } from '@middleware/updateBlogView'
 import { IGetUserAuthInfoRequest } from '@type/jwt'
+import { checkUserInCommunity } from '@middleware/checkUserInCommunity';
 
 const route = express.Router()
 
@@ -37,8 +38,8 @@ route.get('/p/comments/:blogId', controller.blogPerson.comment.getBlogComment)
 
 // community blog
 
-route.post('/:communityId', auth, controller.blogCommunity.blog.newBlog)
-route.post('/:communityId/:communityId/comments', auth, controller.blogCommunity.comment.newComment)
+route.post('/:communityId', auth, checkUserInCommunity, controller.blogCommunity.blog.newBlog)
+route.post('/:communityId/:communityId/comments', auth, checkUserInCommunity, controller.blogCommunity.comment.newComment)
 
 route.get('/:communityId/:blogId', authSoft, updateBlogView, redis.cacheByParam, controller.blogCommunity.blog.getOneBlog)
 route.get('/:communityId', authSoft, (req: IGetUserAuthInfoRequest, res: Response) => {

@@ -16,11 +16,13 @@ const updateLike = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { num } = req.body;
     const { postId } = req.params;
 
+    if (!postId || !num) return res.sendStatus(httpStatus.badRequest)
+
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
     const result = await discussService.like._update({
-      postsId: postId,
-      num,
+      postsId: +postId,
+      num: +(num.toString()),
       username: userObjJWT.username,
     });
 
