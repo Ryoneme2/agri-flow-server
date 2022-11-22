@@ -27,11 +27,18 @@ export const _addGroup = async (data: {
       path: undefined
     }
 
-    await prisma.community.create({
+    const res = await prisma.community.create({
       data: {
         name: data.name,
         communityImage: fileRes.path,
         create_by: data.author
+      }
+    })
+
+    await prisma.userInCommunity.create({
+      data: {
+        username: data.author,
+        commuId: res.commuId
       }
     })
 
