@@ -15,7 +15,7 @@ const prisma = new P.PrismaClient();
 export const _add = async (data: {
   author: string,
   content: string,
-  categories?: number[] | null,
+  categories?: string[] | null,
   file: Express.Multer.File | undefined,
 }) => {
   try {
@@ -24,6 +24,17 @@ export const _add = async (data: {
     const fileRes = data.file ? await uploadToBucket.discuss(uniqueString, data.file.buffer, data?.file.mimetype) : {
       path: null
     }
+
+    const categoriesId = !data.categories ? [] : (await prisma.category.findMany({
+      where: {
+        categoryName: {
+          in: data.categories
+        }
+      },
+      select: {
+        categoryId: true
+      }
+    })).map(v => v.categoryId)
 
     const result = await prisma.discussPost.create({
       data: {
@@ -35,7 +46,7 @@ export const _add = async (data: {
 
     if (data.categories) {
       await prisma.categoryOnDiscuss.createMany({
-        data: data.categories.map(c => {
+        data: categoriesId.map(c => {
           return { categoryId: c, postId: result.dcpId }
         })
       })
