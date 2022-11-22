@@ -14,6 +14,7 @@ import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import { client } from '@config/redisConnect'
 import { _add, _getListRecent } from '@service/discuss/post';
+import { _getAll } from '@service/category-service'
 import moment from 'moment';
 
 export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
@@ -53,6 +54,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
     const posts = await _getListRecent({ limit: +(limit?.toString() || '5'), skip: +(skip?.toString() || '0') })
+    const allCategoryName = await _getAll()
 
     if (!posts.success) return res.sendStatus(httpStatus.internalServerError).send({
       msg: posts.msg
@@ -77,7 +79,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
             imageProfile: l.Users.imageProfile,
           }
         }),
-        tag: post.category,
+        tag: allCategoryName.data?.find(v => v.categoryId === (post.category[0]?.categoryId || '')) || 'ไม่มีแท็คจร้า',
         author: {
           username: post.create_by.username,
           isVerify: post.create_by.isVerify,
