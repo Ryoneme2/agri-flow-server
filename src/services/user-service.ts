@@ -68,6 +68,18 @@ export const _getOne = async ({ username }: { username: string }) => {
     const user = await prisma.users.findUnique({
       where: {
         username,
+      },
+      include: {
+        followedBy: {
+          include: {
+            following: {
+              select: {
+                username: true,
+                imageProfile: true
+              }
+            }
+          }
+        },
       }
     })
 

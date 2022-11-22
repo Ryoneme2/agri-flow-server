@@ -19,6 +19,9 @@ model Users {
   password     String?
   level        Int     @default(0) // 0 => standard, 1 => premium
   isVerify     Boolean @default(false)
+  Facebook     String?
+  Line         String?
+  Bio          String  @default("")
 
   readBlog          UserReadBlogPerson[]    @relation("readBy")
   readBlogCommunity UserReadBlogCommunity[]

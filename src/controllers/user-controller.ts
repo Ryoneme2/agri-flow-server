@@ -24,13 +24,31 @@ const getOne = async (req: Request, res: Response) => {
 
     if (!user.success) return res.status(httpStatus.internalServerError).send(user)
 
+    if (!user.data) return res.sendStatus(httpStatus.notFound)
+
     // await connectClient()
 
-    if (!user.data) return res.send(user)
+    const format = {
+      username: user.data.username,
+      imageProfile: user.data.imageProfile,
+      followerCount: user.data.followedBy.length,
+      follower: user.data.followedBy.map(v => {
+        return {
+          username: v.following.username,
+          imageProfile: v.following.imageProfile
+        }
+      }),
+      contact: {
+        facebook: user.data.Facebook,
+        line: user.data.Line,
+        email: user.data.email
+      },
+      bio: user.data.Bio
+    }
 
-    await client.setEx(`userUsername-${userUsername}`, 3600, JSON.stringify(user.data))
+    // await client.setEx(`userUsername-${userUsername}`, 3600, JSON.stringify(user.data))
 
-    res.send({ ...user, saveCache: true })
+    res.send({ data: format })
 
   } catch (e) {
     console.error(e);
