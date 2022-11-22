@@ -15,7 +15,7 @@ const prisma = new P.PrismaClient();
 export const _add = async (data: {
   author: string,
   content: string,
-  categories?: string[] | null,
+  categories?: string | null,
   file: Express.Multer.File | undefined,
 }) => {
   try {
@@ -28,7 +28,7 @@ export const _add = async (data: {
     const categoriesId = !data.categories ? [] : (await prisma.category.findMany({
       where: {
         categoryName: {
-          in: data.categories
+          in: data.categories.split(',')
         }
       },
       select: {

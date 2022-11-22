@@ -22,7 +22,7 @@ export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const { body, file } = req as {
       body: {
         content: string,
-        categories?: string[],
+        categories?: string,
       },
       file: Express.Multer.File
     }

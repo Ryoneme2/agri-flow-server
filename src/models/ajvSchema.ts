@@ -83,7 +83,7 @@ export const newPostDiscussSchema: SchemaObject = {
   type: "object",
   properties: {
     content: { type: "string" },
-    categories: { type: "array", uniqueItems: true }
+    categories: { type: "string" }
   },
   required: [
     "content",
