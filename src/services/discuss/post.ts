@@ -167,7 +167,7 @@ export const _getOne = async (id: number) => {
               }
             }
           }
-        }
+        },
       }
     })
 

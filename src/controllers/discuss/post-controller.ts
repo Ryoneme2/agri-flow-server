@@ -125,6 +125,8 @@ export const getById = async (req: Request, res: Response) => {
     if (!post.success) return res.status(httpStatus.internalServerError).send({ msg: post.msg })
 
     if (!post.data) return res.status(httpStatus.ok).send({ data: [], msg: '' })
+    const allCategoryName = await _getAll()
+    const tag = allCategoryName.data?.find(v => v.categoryId === (post.data?.category[0]?.categoryId || ''))
 
     const format = {
       id: post.data.dcpId,
@@ -133,7 +135,9 @@ export const getById = async (req: Request, res: Response) => {
         isVerify: post.data.create_by.isVerify,
         imageProfile: post.data.create_by.imageProfile,
       },
+
       likeCount: post.data.likeBy.length,
+      tag: tag || { categoryName: 'ไม่มีแท็คจร้า', categoryId: null },
       likeBy: post.data.likeBy.map(l => {
         if (l.Users === null) return
         return {

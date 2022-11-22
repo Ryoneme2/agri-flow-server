@@ -127,6 +127,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
           title: b.title,
           content: getContent(b.content)
         },
+        isPublic: !b.isSpacial ? true : false,
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
