@@ -12,7 +12,7 @@ const route = express.Router()
 route.post('/p', auth, controller.blogPerson.blog.newBlog)
 route.post('/p/comments', auth, controller.blogPerson.comment.newComment)
 
-route.get('/p/u/:username', controller.blogPerson.blog.getListUserBlog)
+route.get('/p/u/:username', authSoft, controller.blogPerson.blog.getListUserBlog)
 route.get('/p/:blogId', authSoft, updateBlogView, redis.cacheByParam, controller.blogPerson.blog.getOneBlog)
 route.get('/p', authSoft, (req: IGetUserAuthInfoRequest, res: Response) => {
   const { type } = req.query
@@ -32,7 +32,7 @@ route.get('/p', authSoft, (req: IGetUserAuthInfoRequest, res: Response) => {
       break;
   }
 })
-route.get('/p/tag/:categoryId', controller.blogPerson.blog.getListCategoryBlog)
+route.get('/p/tag/:categoryId', authSoft, controller.blogPerson.blog.getListCategoryBlog)
 
 route.get('/p/comments/:blogId', controller.blogPerson.comment.getBlogComment)
 
@@ -59,7 +59,7 @@ route.get('/c/:communityId', authSoft, async (req: IGetUserAuthInfoRequest, res:
       break;
   }
 })
-route.get('/c/:communityId/tag/:categoryId', controller.blogCommunity.blog.getListCategoryBlog)
+route.get('/c/:communityId/tag/:categoryId', authSoft, controller.blogCommunity.blog.getListCategoryBlog)
 
 route.get('/c/:communityId/comments/:blogId', controller.blogCommunity.comment.getBlogComment)
 

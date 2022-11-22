@@ -11,7 +11,7 @@ import * as schema from '@model/ajvSchema'
 import * as blogService from '@service/blog/person/blog-service'
 import moment from 'moment';
 import { client } from '@config/redisConnect';
-import { _getOne, _getOneAll } from '@service/user-service';
+import { _getAllFollowing, _getOne, _getOneAll } from '@service/user-service';
 import getThumbnail from '@util/getThumbnail';
 import getContent from '@util/getConent';
 import { _getAll, _getById } from '@service/category-service';
@@ -50,6 +50,7 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     const { blogId } = req.params
 
+    const userObjJWT = req.jwtObject as UserJwtPayload;
     if (isNaN(+blogId)) return res.status(httpStatus.badRequest).send({
       msg: 'blog id is invalid'
     })
@@ -65,6 +66,7 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!blog.data) return res.send({ msg: 'no blog found' })
 
+    const following = await _getAllFollowing({ author: userObjJWT.username })
     const format = {
       blogContent: {
         title: blog.data.title,
@@ -81,6 +83,7 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
         }
       }),
       author: {
+        isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
         username: blog.data.create_by.username,
         imageProfile: blog.data.create_by.imageProfile,
         blogCount: blog.data.create_by.Blogs.length,
@@ -118,6 +121,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
     const categoryUser = !user.data ? [] : user.data.readBlog.map(rb => rb.Blog.category.map(b => b.categoryId)).flat().flat()
     const blogs = await blogService._getListSuggest({ categoryId: categoryUser, limit: xLimit })
     const allCategoryName = await _getAll()
+    const following = await _getAllFollowing({ author: userObjJWT.username })
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
 
@@ -132,6 +136,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
+          isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
           username: b.create_by.username,
           isVerify: b.create_by.isVerify,
           imageProfile: b.create_by.imageProfile
@@ -156,16 +161,18 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
   }
 }
 
-const getListUserBlog = async (req: Request, res: Response) => {
+const getListUserBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     const { username } = req.params
 
     const blogs = await blogService._getUserBlogList({ username })
 
+    const userObjJWT = req.jwtObject as UserJwtPayload;
     const allCategoryName = await _getAll()
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
+    const following = await _getAllFollowing({ author: userObjJWT.username })
 
     console.log(allCategoryName.data);
 
@@ -180,6 +187,7 @@ const getListUserBlog = async (req: Request, res: Response) => {
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
+          isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
           username: b.create_by.username,
           imageProfile: b.create_by.imageProfile,
           isVerify: b.create_by.isVerify
@@ -202,7 +210,7 @@ const getListUserBlog = async (req: Request, res: Response) => {
   }
 }
 
-const getListCategoryBlog = async (req: Request, res: Response) => {
+const getListCategoryBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     const { skip, limit } = req.query
@@ -211,7 +219,10 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
     const xLimit = !limit ? 3 : +limit.toString()
     const xSkip = !skip ? 3 : +skip.toString()
 
+    const userObjJWT = req.jwtObject as UserJwtPayload;
     const blogs = await blogService._getListByCategory({ tagId: +categoryId, limit: xLimit, skip: xSkip })
+
+    const following = await _getAllFollowing({ author: userObjJWT.username })
 
     const allCategoryName = await _getAll()
 
@@ -230,6 +241,7 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
+          isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
           username: b.create_by.username,
           imageProfile: b.create_by.imageProfile,
           isVerify: b.create_by.isVerify
@@ -261,6 +273,8 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
     const { data, success, msg } = await blogService._getListByFollowing({ author: userObjJWT.username })
     const allCategoryName = await _getAll()
 
+    const following = await _getAllFollowing({ author: userObjJWT.username })
+
     if (!success) return res.status(httpStatus.internalServerError).send({ msg })
 
     const formatBlog = data?.blogs?.map(b => {
@@ -274,6 +288,7 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
+          isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
           username: b.create_by.username,
           isVerify: b.create_by.isVerify,
           imageProfile: b.create_by.imageProfile
@@ -308,6 +323,7 @@ const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const userObjJWT = req.jwtObject as UserJwtPayload
     const allCategoryName = await _getAll()
     const blogs = await _getHistoryList({ author: userObjJWT.username, limit: +(limit?.toString() || '3'), skip: +(skip?.toString() || '0') })
+    const following = await _getAllFollowing({ author: userObjJWT.username })
 
     const formatBlog = blogs?.data?.map(b => {
       return {
@@ -319,6 +335,7 @@ const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
+          isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
           username: b.create_by.username,
           isVerify: b.create_by.isVerify,
           imageProfile: b.create_by.imageProfile

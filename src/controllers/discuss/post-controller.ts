@@ -16,6 +16,8 @@ import { client } from '@config/redisConnect'
 import { _add, _getByUsername, _getListRecent } from '@service/discuss/post';
 import { _getAll } from '@service/category-service'
 import moment from 'moment';
+import { _getAllFollowing } from '@service/user-service';
+import { _getListByFollowing } from '@service/blog/person/blog-service';
 
 export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
@@ -60,6 +62,8 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
       msg: posts.msg
     })
 
+    const following = await _getAllFollowing({ author: userObjJWT.username })
+
     const format = posts.data?.map(post => {
       const tag = allCategoryName.data?.find(v => v.categoryId === (post.category[0]?.categoryId || ''))
       return {
@@ -75,6 +79,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
         likeBy: post.likeBy.map(l => {
           if (l.Users === null) return
           return {
+            isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
             username: l.Users.username,
             isVerify: l.Users.isVerify,
             imageProfile: l.Users.imageProfile,
@@ -113,7 +118,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
   }
 }
 
-export const getById = async (req: Request, res: Response) => {
+export const getById = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     const { postId } = req.params
@@ -121,6 +126,13 @@ export const getById = async (req: Request, res: Response) => {
     if (!postId || postId === undefined) return res.sendStatus(httpStatus.badRequest)
 
     const post = await discussService.post._getOne(+postId)
+
+    const userObjJWT = !req.jwtObject ? {
+      username: null,
+      email: null
+    } : req.jwtObject as UserJwtPayload
+
+    const following = await _getAllFollowing({ author: userObjJWT.username })
 
     if (!post.success) return res.status(httpStatus.internalServerError).send({ msg: post.msg })
 
@@ -131,6 +143,7 @@ export const getById = async (req: Request, res: Response) => {
     const format = {
       id: post.data.dcpId,
       author: {
+        isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
         username: post.data.create_by.username,
         isVerify: post.data.create_by.isVerify,
         imageProfile: post.data.create_by.imageProfile,
@@ -192,6 +205,8 @@ export const getByUsername = async (req: IGetUserAuthInfoRequest, res: Response)
 
     const posts = await _getByUsername(username)
 
+    const following = await _getAllFollowing({ author: userObjJWT.username })
+
     const allCategoryName = await _getAll()
 
     if (!posts.success) return res.sendStatus(httpStatus.internalServerError).send({
@@ -221,6 +236,7 @@ export const getByUsername = async (req: IGetUserAuthInfoRequest, res: Response)
         }),
         tag: tag || { categoryName: 'ไม่มีแท็คจร้า', categoryId: null },
         author: {
+          isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
           username: post.create_by.username,
           isVerify: post.create_by.isVerify,
           imageProfile: post.create_by.imageProfile
@@ -250,17 +266,6 @@ export const getByUsername = async (req: IGetUserAuthInfoRequest, res: Response)
 }
 
 export const getSuggestPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
-  try {
-
-    res.sendStatus(httpStatus.notImplemented)
-
-  } catch (e) {
-    console.error(e);
-    return res.sendStatus(httpStatus.internalServerError)
-  }
-}
-
-export const getFollowPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     res.sendStatus(httpStatus.notImplemented)

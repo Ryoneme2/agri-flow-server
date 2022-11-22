@@ -249,3 +249,35 @@ export const _addFollow = async ({ who, author }: { who: string, author: string 
     }
   }
 }
+
+export const _getAllFollowing = async ({ author }: { author: string | null }) => {
+  try {
+
+    if (author === null) return {
+      success: true,
+      data: [],
+      msg: ''
+    }
+
+    const follows = (await prisma.follows.findMany({
+      where: {
+        followingUser: author
+      }
+    })).map(v => v.followerUser)
+
+    return {
+      success: true,
+      data: follows,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: [],
+      msg: 'internal error on get following service'
+    }
+
+  }
+}
