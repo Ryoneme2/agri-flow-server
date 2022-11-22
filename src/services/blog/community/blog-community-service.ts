@@ -163,7 +163,7 @@ export const _getListSuggest = async ({ categoryId, limit = 3, communityId }: { 
     const blogCount = await prisma.blogsOnCommunity.count({
       where: {
         category: {
-          some: {
+          every: {
             categoryId: {
               in: [...new Set(category)]
             }
@@ -182,7 +182,7 @@ export const _getListSuggest = async ({ categoryId, limit = 3, communityId }: { 
       take: limit,
       where: {
         category: {
-          some: {
+          every: {
             categoryId: {
               in: [...new Set(category)]
             }
