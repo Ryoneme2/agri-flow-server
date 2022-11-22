@@ -17,6 +17,7 @@ const prisma = new P.PrismaClient();
 export const _addGroup = async (data: {
   author: string,
   name: string,
+  description: string,
   file: Express.Multer.File | undefined,
 }) => {
   try {
@@ -31,7 +32,8 @@ export const _addGroup = async (data: {
       data: {
         name: data.name,
         communityImage: fileRes.path,
-        create_by: data.author
+        create_by: data.author,
+        description: data.description
       }
     })
 

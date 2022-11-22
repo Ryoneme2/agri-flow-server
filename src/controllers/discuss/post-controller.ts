@@ -45,10 +45,12 @@ export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   }
 }
 
-export const getRecentPost = async (req: Request, res: Response) => {
+export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
     const { limit, skip } = req.query
+
+    const userObjJWT = req.jwtObject as UserJwtPayload;
 
     const posts = await _getListRecent({ limit: +(limit?.toString() || '5'), skip: +(skip?.toString() || '0') })
 
@@ -64,6 +66,9 @@ export const getRecentPost = async (req: Request, res: Response) => {
           file: post.File
         },
         likeCount: post.likeBy.length,
+        isLike: post.likeBy
+          .map((item) => item.Users?.username)
+          .includes(userObjJWT.username),
         likeBy: post.likeBy.map(l => {
           if (l.Users === null) return
           return {

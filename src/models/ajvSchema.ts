@@ -105,7 +105,8 @@ export const follow: SchemaObject = {
 export const newGroupSchema: SchemaObject = {
   type: "object",
   properties: {
-    name: { type: "string" },
+    name: { type: "string", minLength: 5 },
+    description: { type: "string" },
   },
   required: [
     "name",
