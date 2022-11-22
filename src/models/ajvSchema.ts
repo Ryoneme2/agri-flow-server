@@ -113,3 +113,16 @@ export const newGroupSchema: SchemaObject = {
   ],
   additionalProperties: false
 }
+
+export const newCommentDiscussSchema: SchemaObject = {
+  type: "object",
+  properties: {
+    postId: { type: "number", minLength: 1 },
+    content: { type: "string", minLength: 1 },
+  },
+  required: [
+    "postId",
+    "content",
+  ],
+  additionalProperties: false
+}

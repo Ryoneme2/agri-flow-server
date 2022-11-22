@@ -14,7 +14,7 @@ route.post('/post', auth, upload.single('file'), controller.post.newPost);
 route.put('/post/:postId', auth, controller.post.editPost);
 route.delete('/post/:postId', auth, controller.post.deletePost);
 
-route.post('/comments/add', auth, controller.comment.newComment);
+route.post('/comments/', auth, controller.comment.newComment);
 route.get('/comments/:postId', controller.comment.getCommentByPost);
 
 route.put('/like/:postId', auth, controller.like.updateLike)

@@ -10,6 +10,7 @@ import { validateSchema } from '@helper/validateSchema';
 import * as schema from '@model/ajvSchema'
 import * as userService from '@service/user-service'
 import { client } from '@config/redisConnect'
+import { _add } from '@service/discuss/comment';
 
 
 export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) => {
@@ -19,11 +20,15 @@ export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) =>
 
     const userObjJWT = req.jwtObject as UserJwtPayload;
 
-    const { success, msg } = validateSchema(schema.newPostSchema, bodyData)
+    const { success, msg } = validateSchema(schema.newCommentDiscussSchema, bodyData)
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    res.sendStatus(httpStatus.notImplemented)
+    const response = await _add({ author: userObjJWT.username, postId: bodyData.postId, content: bodyData.content })
+
+    if (!response.success) return res.sendStatus(httpStatus.internalServerError)
+
+    res.sendStatus(httpStatus.created)
 
   } catch (e) {
     console.error(e);
