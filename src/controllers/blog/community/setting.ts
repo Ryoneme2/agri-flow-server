@@ -44,7 +44,7 @@ export const getOne = async (req: Request, res: Response) => {
 
     if (!data.success) return res.status(httpStatus.internalServerError).send({ msg: data.msg })
 
-    res.send({ data, msg: '' })
+    res.send({ data: data.data, msg: '' })
 
   } catch (e) {
     console.error(e);
