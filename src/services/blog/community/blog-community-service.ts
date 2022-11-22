@@ -155,10 +155,8 @@ export const _getListSuggest = async ({ categoryId, limit = 3, communityId }: { 
     const shuffle = (array) => {
       return [...array].sort(() => Math.random() - 0.5);
     }
-
-    const category = categoryId.length === 0 ? [...new Set(new Array(3).fill(0).map(_ => Math.ceil(Math.random() * 9)))] : shuffle(categoryId)
-
-    console.log({ x: [...new Set(category)] });
+    const categoryCount = [...new Set((await prisma.categoryOnBlogs.findMany({})).map(v => v.categoryId))]
+    const category = categoryId.length === 0 ? shuffle(categoryCount) : shuffle(categoryId)
 
     const blogCount = await prisma.blogsOnCommunity.count({
       where: {
@@ -220,6 +218,44 @@ export const _getListSuggest = async ({ categoryId, limit = 3, communityId }: { 
     }
   } finally {
     prisma.$disconnect()
+  }
+}
+
+export const _getListRecent = async ({ communityId }: { communityId: string }) => {
+  try {
+
+    const blogs = await prisma.blogsOnCommunity.findMany({
+      where: {
+        communityCommuId: communityId
+      },
+      include: {
+        create_by: {
+          select: {
+            username: true,
+            imageProfile: true,
+            isVerify: true
+          }
+        },
+        category: true
+      },
+      orderBy: {
+        create_at: 'desc'
+      }
+    })
+
+    return {
+      success: true,
+      data: blogs,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal in get recent list service'
+    }
+
   }
 }
 

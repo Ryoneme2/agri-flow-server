@@ -131,7 +131,7 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
     const shuffle = (array) => {
       return [...array].sort(() => Math.random() - 0.5);
     }
-    const categoryCount = [...new Set()]
+    const categoryCount = [...new Set((await prisma.categoryOnBlogs.findMany({})).map(v => v.categoryId))]
 
     console.log(shuffle(categoryCount));
 

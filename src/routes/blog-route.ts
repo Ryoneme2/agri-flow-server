@@ -42,18 +42,20 @@ route.post('/c/:communityId', auth, checkUserInCommunity, controller.blogCommuni
 route.post('/c/:communityId/:communityId/comments', auth, checkUserInCommunity, controller.blogCommunity.comment.newComment)
 
 route.get('/c/:communityId/:blogId', authSoft, updateBlogView, redis.cacheByParam, controller.blogCommunity.blog.getOneBlog)
-route.get('/c/:communityId', authSoft, (req: IGetUserAuthInfoRequest, res: Response) => {
+route.get('/c/:communityId', authSoft, async (req: IGetUserAuthInfoRequest, res: Response) => {
   const { type } = req.query
-  const xquery = !type ? 'suggest' : type
-  switch (xquery) {
+  switch (type) {
     case 'suggest':
-      controller.blogCommunity.blog.getSuggestListBlog(req, res)
+      await controller.blogCommunity.blog.getSuggestListBlog(req, res)
       break;
     case 'history':
-      controller.blogCommunity.blog.getListHistory(req, res)
+      await controller.blogCommunity.blog.getListHistory(req, res)
+      break;
+    case 'recent':
+      await controller.blogCommunity.blog.getListRecent(req, res)
       break;
     default:
-      controller.blogCommunity.blog.getSuggestListBlog(req, res)
+      await controller.blogCommunity.blog.getListRecent(req, res)
       break;
   }
 })

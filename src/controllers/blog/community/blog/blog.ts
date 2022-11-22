@@ -212,6 +212,48 @@ const getListCategoryBlog = async (req: Request, res: Response) => {
   }
 }
 
+const getListRecent = async (req: Request, res: Response) => {
+  try {
+
+    const { communityId } = req.params
+
+    const blogs = await blogService._getListRecent({ communityId })
+
+    const allCategoryName = await _getAll()
+
+    if (!blogs.data) return res.send({ msg: 'no blog found' })
+
+    console.log(blogs);
+
+    const formatBlog = blogs.data.map(b => {
+      return {
+        id: b.blogId,
+        blogContent: {
+          title: b.title,
+          content: getContent(b.content)
+        },
+        create_at: moment(b.create_at).fromNow(),
+        thumbnail: getThumbnail(b.content),
+        author: {
+          username: b.create_by.username,
+          imageProfile: b.create_by.imageProfile,
+          isVerify: b.create_by.isVerify
+        },
+        tag: (allCategoryName?.data?.find(v => v.categoryId === b.category[0]?.categoryId)) || 'ไม่มีแท็คจร้า',
+      }
+    })
+
+    res.send({
+      data: formatBlog,
+      msg: ''
+    })
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
 const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
@@ -264,5 +306,6 @@ export {
   getOneBlog,
   getSuggestListBlog,
   getListCategoryBlog,
-  getListHistory
+  getListHistory,
+  getListRecent
 }
