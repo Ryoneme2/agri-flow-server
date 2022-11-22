@@ -38,6 +38,8 @@ const getOne = async (req: Request, res: Response) => {
           imageProfile: v.following.imageProfile
         }
       }),
+      isVerify: user.data.isVerify,
+      level: user.data.level,
       contact: {
         facebook: user.data.Facebook,
         line: user.data.Line,
