@@ -61,6 +61,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
     })
 
     const format = posts.data?.map(post => {
+      const tag = allCategoryName.data?.find(v => v.categoryId === (post.category[0]?.categoryId || ''))
       return {
         id: post.dcpId,
         post: {
@@ -79,7 +80,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
             imageProfile: l.Users.imageProfile,
           }
         }),
-        tag: allCategoryName.data?.find(v => v.categoryId === (post.category[0]?.categoryId || '')) || 'ไม่มีแท็คจร้า',
+        tag: tag || { categoryName: 'ไม่มีแท็คจร้า', categoryId: null },
         author: {
           username: post.create_by.username,
           isVerify: post.create_by.isVerify,
