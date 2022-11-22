@@ -131,22 +131,26 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
     const shuffle = (array) => {
       return [...array].sort(() => Math.random() - 0.5);
     }
+    const categoryCount = [...new Set()]
 
-    const category = categoryId.length === 0 ? [...new Set(new Array(3).fill(0).map(_ => Math.ceil(Math.random() * 9)))] : shuffle(categoryId)
+    console.log(shuffle(categoryCount));
 
-    console.log({ x: [...new Set(category)] });
+    const category = categoryId.length === 0 ? shuffle(categoryCount) : shuffle(categoryId)
 
     const blogCount = await prisma.blogs.count({
       where: {
         category: {
-          some: {
+          every: {
             categoryId: {
-              in: [...new Set(category)]
+              in: category
             }
           }
         }
       }
     })
+
+    console.log({ blogCount });
+
 
     const ableSkip = blogCount - limit < 0 ? 0 : blogCount - limit
 
@@ -157,9 +161,9 @@ export const _getListSuggest = async ({ categoryId, limit = 3 }: { categoryId: n
       take: limit,
       where: {
         category: {
-          some: {
+          every: {
             categoryId: {
-              in: [...new Set(category)]
+              in: category
             }
           }
         }

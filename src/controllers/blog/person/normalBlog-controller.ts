@@ -70,6 +70,7 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
         title: blog.data.title,
         content: blog.data.content
       },
+      isPublic: !blog.data.isSpacial ? true : false,
       categories,
       create_at: moment(blog.data.create_at).fromNow(),
       comments: blog.data.BlogComment.map(comment => {
@@ -135,7 +136,9 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
           isVerify: b.create_by.isVerify,
           imageProfile: b.create_by.imageProfile
         },
-        tag: allCategoryName.data?.find(v => v.categoryId === b.category[0].categoryId) || 'ไม่มีแท็คจร้า',
+        tag: allCategoryName.data?.find(v => v.categoryId === b.category[0]?.categoryId) || {
+          categoryName: 'ไม่มีแท็คจร้า', categoryId: null
+        },
       }
     })
 
