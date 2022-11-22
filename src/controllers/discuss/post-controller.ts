@@ -66,9 +66,9 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
           file: post.File
         },
         likeCount: post.likeBy.length,
-        isLike: post.likeBy
+        isLike: !userObjJWT?.username ? false : post.likeBy
           .map((item) => (item.Users?.username || ''))
-          .includes(userObjJWT.username),
+          .includes(userObjJWT?.username),
         likeBy: post.likeBy.map(l => {
           if (l.Users === null) return
           return {
