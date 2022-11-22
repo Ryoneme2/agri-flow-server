@@ -149,6 +149,8 @@ model Community {
   communityImage String   @default("https://thumbs.dreamstime.com/z/people-line-icon-team-outline-logo-illustration-linear-pictogram-isolated-white-90235968.jpg")
   create_at      DateTime @default(now())
 
+  description String @default("")
+
   users            UserInCommunity[]
   BlogsOnCommunity BlogsOnCommunity[]
 

@@ -8,6 +8,7 @@ import * as schema from '@model/ajvSchema'
 import { Request, Response } from 'express';
 import { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt';
 import { _join } from '@service/blog/community/blog-community-service';
+import * as communityService from '@service/community-service'
 
 dotenv.config();
 
@@ -74,6 +75,42 @@ export const deleteGroup = async (req: IGetUserAuthInfoRequest, res: Response) =
   try {
 
     res.send(httpStatus.notImplemented)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+export const getListAllGroup = async (req: Request, res: Response) => {
+  try {
+
+    const { limit, skip } = req.query
+
+    const communities = await communityService._getList({ limit: +(limit?.toString() || '4'), skip: +(skip?.toString() || '0') })
+
+    if (!communities.success) return res.sendStatus(httpStatus.internalServerError).send({ msg: communities.msg })
+
+    const format = communities.data?.map(c => {
+      return {
+        title: c.name,
+        description: c.description,
+        image: c.communityImage,
+        userCount: c.users.length,
+        user: c.users.map(mem => {
+          return {
+            username: mem.Users.username,
+            imageProfile: mem.Users.imageProfile
+          }
+        })
+      }
+    })
+
+    res.send({
+      msg: '',
+      data: format
+    })
+
 
   } catch (e) {
     console.error(e);

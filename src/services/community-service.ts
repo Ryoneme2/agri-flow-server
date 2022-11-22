@@ -48,3 +48,40 @@ export const _addGroup = async (data: {
     }
   }
 }
+
+export const _getList = async ({ limit, skip }: { limit: number, skip: number }) => {
+  try {
+
+    const communities = await prisma.community.findMany({
+      take: limit,
+      skip,
+      include: {
+        users: {
+          select: {
+            Users: {
+              select: {
+                username: true,
+                imageProfile: true
+              }
+            }
+          }
+        }
+      }
+    })
+
+    return {
+      success: true,
+      data: communities,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error on get list service'
+    }
+
+  }
+}
