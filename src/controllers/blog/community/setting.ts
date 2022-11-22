@@ -97,6 +97,7 @@ export const getListAllGroup = async (req: Request, res: Response) => {
 
     const format = communities.data?.map(c => {
       return {
+        id: c.commuId,
         title: c.name,
         description: c.description,
         image: c.communityImage,
