@@ -9,14 +9,13 @@ import { httpStatus } from '@config/http';
 import defaultValue from '@config/defaultValue';
 import { validateSchema } from '@helper/validateSchema';
 import * as schema from '@model/ajvSchema'
-import * as blogService from '@service/blog/person/blog-service'
+import * as blogService from '@service/blog/community/comment-service'
 import moment from 'moment';
 import { client } from '@config/redisConnect';
 import { _getOne, _getOneAll } from '@service/user-service';
 import { _getAll, _getById } from '@service/category-service';
 import { _add, _getCommentByBlogId } from '@service/blog/person/comment-service';
 
-// TODO : FIX
 export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {
 
@@ -46,8 +45,6 @@ export const newComment = async (req: IGetUserAuthInfoRequest, res: Response) =>
     return res.sendStatus(httpStatus.internalServerError)
   }
 }
-// TODO : FIX
-
 export const getBlogComment = async (req: Request, res: Response) => {
   try {
 
