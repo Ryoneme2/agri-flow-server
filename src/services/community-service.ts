@@ -46,6 +46,7 @@ export const _addGroup = async (data: {
 
     return {
       success: true,
+      data: res,
       msg: ''
     }
 

@@ -53,7 +53,10 @@ export const newGroup = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!response.success) return res.status(httpStatus.internalServerError).send({ msg: response.msg })
 
-    res.sendStatus(httpStatus.created)
+    res.send({
+      data: response,
+      msg: ''
+    })
 
   } catch (e) {
     console.error(e);
