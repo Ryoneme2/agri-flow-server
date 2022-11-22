@@ -36,7 +36,7 @@ export const newPost = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!success) return res.status(httpStatus.badRequest).send({ msg })
 
-    const response = await _add({ author: userObjJWT.username, content: body.content, categories: body.categories, file })
+    const response = await _add({ author: userObjJWT?.username, content: body.content, categories: body.categories, file })
 
     if (!response.success) return res.sendStatus(httpStatus.internalServerError)
 
@@ -62,7 +62,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
       msg: posts.msg
     })
 
-    const following = await _getAllFollowing({ author: userObjJWT.username })
+    const following = await _getAllFollowing({ author: userObjJWT?.username })
 
     const format = posts.data?.map(post => {
       const tag = allCategoryName.data?.find(v => v.categoryId === (post.category[0]?.categoryId || ''))
@@ -79,7 +79,7 @@ export const getRecentPost = async (req: IGetUserAuthInfoRequest, res: Response)
         likeBy: post.likeBy.map(l => {
           if (l.Users === null) return
           return {
-            isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
+            isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
             username: l.Users.username,
             isVerify: l.Users.isVerify,
             imageProfile: l.Users.imageProfile,
@@ -132,7 +132,7 @@ export const getById = async (req: IGetUserAuthInfoRequest, res: Response) => {
       email: null
     } : req.jwtObject as UserJwtPayload
 
-    const following = await _getAllFollowing({ author: userObjJWT.username })
+    const following = await _getAllFollowing({ author: userObjJWT?.username })
 
     if (!post.success) return res.status(httpStatus.internalServerError).send({ msg: post.msg })
 
@@ -143,7 +143,7 @@ export const getById = async (req: IGetUserAuthInfoRequest, res: Response) => {
     const format = {
       id: post.data.dcpId,
       author: {
-        isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
+        isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
         username: post.data.create_by.username,
         isVerify: post.data.create_by.isVerify,
         imageProfile: post.data.create_by.imageProfile,
@@ -205,7 +205,7 @@ export const getByUsername = async (req: IGetUserAuthInfoRequest, res: Response)
 
     const posts = await _getByUsername(username)
 
-    const following = await _getAllFollowing({ author: userObjJWT.username })
+    const following = await _getAllFollowing({ author: userObjJWT?.username })
 
     const allCategoryName = await _getAll()
 
@@ -236,7 +236,7 @@ export const getByUsername = async (req: IGetUserAuthInfoRequest, res: Response)
         }),
         tag: tag || { categoryName: 'ไม่มีแท็คจร้า', categoryId: null },
         author: {
-          isFollow: !userObjJWT.username ? false : following.data.includes(userObjJWT.username),
+          isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
           username: post.create_by.username,
           isVerify: post.create_by.isVerify,
           imageProfile: post.create_by.imageProfile
