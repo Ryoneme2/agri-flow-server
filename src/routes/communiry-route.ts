@@ -9,5 +9,6 @@ route.post('/', upload.single('file'), auth, controller.newGroup)
 route.post('/join', auth, controller.joinGroup)
 
 route.get('/', controller.getListAllGroup)
+route.get('/:communityId', controller.getOne)
 
 export default route

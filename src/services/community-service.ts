@@ -59,6 +59,59 @@ export const _addGroup = async (data: {
   }
 }
 
+// blog , name , blogcount , member in the commu ,descp
+export const _getOne = async ({ communityId }) => {
+  try {
+
+    const res = await prisma.community.findUnique({
+      where: {
+        commuId: communityId
+      },
+      include: {
+        users: {
+          include: {
+            Users: {
+              select: {
+                username: true,
+                imageProfile: true,
+                isVerify: true
+              }
+            }
+          }
+        },
+        BlogsOnCommunity: {
+          include: {
+            create_by: {
+              select: {
+                username: true,
+                imageProfile: true,
+                isVerify: true
+              }
+            },
+            category: true
+          }
+        }
+      }
+    })
+
+
+
+    return {
+      msg: '',
+      data: res,
+      success: true
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      data: null,
+      msg: 'internal error on get one service'
+    }
+  }
+}
+
 export const _getList = async ({ limit, skip }: { limit: number, skip: number }) => {
   try {
 

@@ -1,4 +1,4 @@
-import { _addGroup } from '@service/community-service';
+import { _addGroup, _getOne } from '@service/community-service';
 import { validateSchema } from '@helper/validateSchema';
 import { httpStatus } from '@config/http';
 import moment from 'moment';
@@ -26,6 +26,25 @@ export const joinGroup = async (req: IGetUserAuthInfoRequest, res: Response) => 
     if (!response.success) return res.status(httpStatus.internalServerError).send({ msg: response.msg })
 
     res.sendStatus(httpStatus.created)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
+export const getOne = async (req: Request, res: Response) => {
+  try {
+
+    const { communityId } = req.params
+
+    if (!communityId) return res.sendStatus(httpStatus.badRequest)
+
+    const data = await _getOne({ communityId })
+
+    if (!data.success) return res.status(httpStatus.internalServerError).send({ msg: data.msg })
+
+    res.send({ data, msg: '' })
 
   } catch (e) {
     console.error(e);
