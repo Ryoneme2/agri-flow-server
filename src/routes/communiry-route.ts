@@ -6,5 +6,6 @@ import { upload } from '@config/uploadFileConfig';
 const route = express.Router()
 
 route.post('/', upload.single('file'), auth, controller.newGroup)
+route.post('/join', auth, controller.joinGroup)
 
 export default route

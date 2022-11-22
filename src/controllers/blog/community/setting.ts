@@ -7,8 +7,30 @@ import * as schema from '@model/ajvSchema'
 
 import { Request, Response } from 'express';
 import { IGetUserAuthInfoRequest, UserJwtPayload } from '@type/jwt';
+import { _join } from '@service/blog/community/blog-community-service';
 
 dotenv.config();
+
+export const joinGroup = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    const { communityId } = req.body
+
+    if (!communityId) return res.sendStatus(httpStatus.badRequest)
+
+    const userObjJWT = req.jwtObject as UserJwtPayload
+
+    const response = await _join({ author: userObjJWT.username, communityId })
+
+    if (!response.success) return res.status(httpStatus.internalServerError).send({ msg: response.msg })
+
+    res.sendStatus(httpStatus.created)
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
 
 export const newGroup = async (req: IGetUserAuthInfoRequest, res: Response) => {
   try {

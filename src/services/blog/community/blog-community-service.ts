@@ -10,6 +10,32 @@ dotenv.config();
 
 const prisma = new P.PrismaClient();
 
+export const _join = async ({ author, communityId }: { author: string, communityId: string }) => {
+  try {
+
+    await prisma.userInCommunity.create({
+      data: {
+        username: author,
+        commuId: communityId
+      }
+    })
+
+    return {
+      success: true,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on join community service'
+    }
+
+
+  }
+}
+
 export const _add = async ({ author, title, content, categories }: { author: { commuId: string, username: string }, title: string, content: string, categories?: string[] }) => {
   try {
 
