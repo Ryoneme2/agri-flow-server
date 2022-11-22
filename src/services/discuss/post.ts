@@ -190,6 +190,63 @@ export const _getOne = async (id: number) => {
   }
 }
 
+export const _getByUsername = async (username: string) => {
+  try {
+
+    const posts = await prisma.discussPost.findMany({
+      where: {
+        usersUsername: username
+      },
+      include: {
+        likeBy: {
+          select: {
+            Users: {
+              select: {
+                username: true,
+                isVerify: true,
+                imageProfile: true,
+              }
+            }
+          }
+        },
+        create_by: {
+          select: {
+            username: true,
+            isVerify: true,
+            imageProfile: true
+          }
+        },
+        DiscussComment: {
+          include: {
+            create_by: {
+              select: {
+                username: true,
+                imageProfile: true,
+                isVerify: true
+              }
+            },
+            discuss_at: true,
+          }
+        },
+        category: true
+      }
+    })
+
+    return {
+      success: true,
+      data: posts,
+      msg: ''
+    }
+
+  } catch (e) {
+    console.error(e);
+    return {
+      success: false,
+      msg: 'internal error on get post by username service'
+    }
+  }
+}
+
 export const _deletePost = async (postId: number) => {
   try {
 

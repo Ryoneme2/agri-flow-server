@@ -8,7 +8,8 @@ const route = express.Router()
 // add post, get suggest, get by id, edit, delete
 
 route.get('/post', authSoft, controller.post.getRecentPost);
-route.get('/post/:postId', authSoft, controller.post.getById);
+route.get('/post/:postId', controller.post.getById);
+route.get('/post/u/:username', authSoft, controller.post.getByUsername);
 // route.get('/post/recent', controller.post.getRecentPost);
 route.post('/post', auth, upload.single('file'), controller.post.newPost);
 route.put('/post/:postId', auth, controller.post.editPost);

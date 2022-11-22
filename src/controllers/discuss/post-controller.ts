@@ -13,7 +13,7 @@ import * as discussService from '@service/discuss'
 import { Prisma } from '@prisma/client'
 import { decodePassword } from '@util/DecryptEncryptString';
 import { client } from '@config/redisConnect'
-import { _add, _getListRecent } from '@service/discuss/post';
+import { _add, _getByUsername, _getListRecent } from '@service/discuss/post';
 import { _getAll } from '@service/category-service'
 import moment from 'moment';
 
@@ -175,6 +175,77 @@ export const getById = async (req: Request, res: Response) => {
     console.error(e);
     return res.sendStatus(httpStatus.internalServerError)
 
+  }
+}
+
+export const getByUsername = async (req: IGetUserAuthInfoRequest, res: Response) => {
+  try {
+
+    const { username } = req.params
+
+    const userObjJWT = !req.jwtObject ? {
+      username: null,
+      email: null
+    } : req.jwtObject as UserJwtPayload
+
+    if (!username) return res.sendStatus(httpStatus.badRequest)
+
+    const posts = await _getByUsername(username)
+
+    const allCategoryName = await _getAll()
+
+    if (!posts.success) return res.sendStatus(httpStatus.internalServerError).send({
+      msg: posts.msg
+    })
+
+
+    const format = posts.data?.map(post => {
+      const tag = allCategoryName.data?.find(v => v.categoryId === (post.category[0]?.categoryId || ''))
+      return {
+        id: post.dcpId,
+        post: {
+          content: post.content,
+          file: post.File
+        },
+        likeCount: post.likeBy.length,
+        isLike: !userObjJWT?.username ? false : post.likeBy
+          .map((item) => (item.Users?.username || ''))
+          .includes(userObjJWT?.username),
+        likeBy: post.likeBy.map(l => {
+          if (l.Users === null) return
+          return {
+            username: l.Users.username,
+            isVerify: l.Users.isVerify,
+            imageProfile: l.Users.imageProfile,
+          }
+        }),
+        tag: tag || { categoryName: 'ไม่มีแท็คจร้า', categoryId: null },
+        author: {
+          username: post.create_by.username,
+          isVerify: post.create_by.isVerify,
+          imageProfile: post.create_by.imageProfile
+        },
+        create_at: moment(post.create_at).fromNow(),
+        comments: post.DiscussComment.map(comment => {
+          return {
+            id: comment.id,
+            content: comment.context,
+            commenter: {
+              username: comment.create_by.username,
+              isVerify: comment.create_by.isVerify,
+              imageProfile: comment.create_by.imageProfile
+            },
+            create_at: moment(comment.discuss_at.create_at).fromNow()
+          }
+        })
+      }
+    })
+
+    res.send({ data: format, msg: '' })
+
+  } catch (e) {
+    console.error(e);
+    return res.sendStatus(httpStatus.internalServerError)
   }
 }
 
