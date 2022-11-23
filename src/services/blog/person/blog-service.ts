@@ -210,12 +210,14 @@ export const _getListByCategory = async ({ tagId, limit = 3, skip = 0 }: {
 
     const [blogs, count] = await prisma.$transaction([
       prisma.blogs.findMany({
-        skip,
-        take: limit,
+        // skip,
+        // take: limit,
         where: {
           category: {
-            every: {
-              categoryId: tagId
+            some: {
+              categoryId: {
+                in: tagId,
+              }
             }
           }
         },
