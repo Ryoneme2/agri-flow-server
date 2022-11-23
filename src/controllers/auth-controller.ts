@@ -90,10 +90,10 @@ const singleSignOnLine = async (req: Request, res: Response) => {
 
     console.log({ userData });
 
-    const user = await userService._getOneMail({ mail: userData.data.mail })
+    const user = await userService._getOne({ username: userData.data.name })
 
     if (user === null) {
-      const resAddedUser = await userService._add({ username: userData.data.name, password: null, email: userData.data.email, imageProfile: userData.data.picture })
+      const resAddedUser = await userService._add({ username: userData.data.name, password: null, email: null, imageProfile: userData.data.picture })
       if (!resAddedUser.success) return res.sendStatus(httpStatus.internalServerError)
     }
 
@@ -116,8 +116,8 @@ const singleSignOnLine = async (req: Request, res: Response) => {
       data: {
         token,
         user: {
-          imageProfile: userData.data.imageProfile,
-          username: userData.data.username
+          imageProfile: userData.data.picture,
+          username: userData.data.name
         }
       }
     })

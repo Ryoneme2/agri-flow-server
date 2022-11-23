@@ -62,7 +62,7 @@ export const _addLine = async ({ username, email, imageProfile = defaultValue.bl
 export const _add = async ({ username, password, email, imageProfile = defaultValue.blankImage }: {
   username: string,
   password: string | null,
-  email: string,
+  email: string | null,
   imageProfile?: string
 }) => {
   try {
