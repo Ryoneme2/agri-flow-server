@@ -21,6 +21,8 @@ export const joinGroup = async (req: IGetUserAuthInfoRequest, res: Response) => 
 
     const userObjJWT = req.jwtObject as UserJwtPayload
 
+    console.log({ userObjJWT });
+
     const response = await _join({ author: userObjJWT.username, communityId })
 
     if (!response.success) return res.status(httpStatus.internalServerError).send({ msg: response.msg })

@@ -88,14 +88,18 @@ const singleSignOnLine = async (req: Request, res: Response) => {
       })
     );
 
-    console.log({ userData });
+    // console.log({ userData });
 
     const user = await userService._getOne({ username: userData.data.name })
 
-    if (user === null) {
-      const resAddedUser = await userService._add({ username: userData.data.name, password: null, email: null, imageProfile: userData.data.picture })
-      if (!resAddedUser.success) return res.sendStatus(httpStatus.internalServerError)
-    }
+    console.log({ user: user.data });
+
+
+    await userService._add({ username: userData.data.name, password: null, email: null, imageProfile: userData.data.picture })
+    // if (!resAddedUser.success) return res.sendStatus(httpStatus.internalServerError)
+
+    // console.log({ resAddedUser });
+
 
     const secret = process.env.JWT_SECRET;
 
@@ -106,8 +110,8 @@ const singleSignOnLine = async (req: Request, res: Response) => {
 
     const token = jwt.sign(
       {
-        username: userData.data.user_id,
-        email: userData.data.email,
+        username: userData.data.name,
+        email: null,
       },
       secret
     );
