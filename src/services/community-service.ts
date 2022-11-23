@@ -129,6 +129,8 @@ export const _getList = async ({ limit, skip }: { limit: number, skip: number })
             }
           }
         }
+      }, orderBy: {
+        create_at: "desc"
       }
     })
 

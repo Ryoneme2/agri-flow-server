@@ -112,7 +112,7 @@ export const getListAllGroup = async (req: Request, res: Response) => {
 
     const { limit, skip } = req.query
 
-    const communities = await communityService._getList({ limit: +(limit?.toString() || '4'), skip: +(skip?.toString() || '0') })
+    const communities = await communityService._getList({ limit: +(limit?.toString() || '100'), skip: +(skip?.toString() || '0') })
 
     if (!communities.success) return res.sendStatus(httpStatus.internalServerError).send({ msg: communities.msg })
 
