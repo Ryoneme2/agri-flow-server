@@ -83,7 +83,7 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
         }
       }),
       author: {
-        isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
+        isFollow: !userObjJWT?.username ? false : following.data.includes(blog.data.create_by.username),
         username: blog.data.create_by.username,
         imageProfile: blog.data.create_by.imageProfile,
         blogCount: blog.data.create_by.Blogs.length,
@@ -136,7 +136,7 @@ const getSuggestListBlog = async (req: IGetUserAuthInfoRequest, res: Response) =
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
+          isFollow: !userObjJWT?.username ? false : following.data.includes(b.create_by.username),
           username: b.create_by.username,
           isVerify: b.create_by.isVerify,
           imageProfile: b.create_by.imageProfile
@@ -187,7 +187,7 @@ const getListUserBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
+          isFollow: !userObjJWT?.username ? false : following.data.includes(b.create_by.username),
           username: b.create_by.username,
           imageProfile: b.create_by.imageProfile,
           isVerify: b.create_by.isVerify
@@ -224,6 +224,8 @@ const getListCategoryBlog = async (req: IGetUserAuthInfoRequest, res: Response) 
 
     const following = await _getAllFollowing({ author: userObjJWT?.username })
 
+    console.log({ following });
+
     const allCategoryName = await _getAll()
 
     if (!blogs.data) return res.send({ msg: 'no blog found' })
@@ -241,7 +243,7 @@ const getListCategoryBlog = async (req: IGetUserAuthInfoRequest, res: Response) 
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
+          isFollow: !userObjJWT?.username ? false : following.data.includes(b.create_by.username),
           username: b.create_by.username,
           imageProfile: b.create_by.imageProfile,
           isVerify: b.create_by.isVerify
@@ -288,7 +290,7 @@ const getListFollowingBlog = async (req: IGetUserAuthInfoRequest, res: Response)
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
+          isFollow: !userObjJWT?.username ? false : following.data.includes(b.create_by.username),
           username: b.create_by.username,
           isVerify: b.create_by.isVerify,
           imageProfile: b.create_by.imageProfile
@@ -335,7 +337,7 @@ const getListHistory = async (req: IGetUserAuthInfoRequest, res: Response) => {
         create_at: moment(b.create_at).fromNow(),
         thumbnail: getThumbnail(b.content),
         author: {
-          isFollow: !userObjJWT?.username ? false : following.data.includes(userObjJWT?.username),
+          isFollow: !userObjJWT?.username ? false : following.data.includes(b.create_by.username),
           username: b.create_by.username,
           isVerify: b.create_by.isVerify,
           imageProfile: b.create_by.imageProfile
