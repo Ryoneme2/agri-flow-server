@@ -66,7 +66,7 @@ const getOneBlog = async (req: IGetUserAuthInfoRequest, res: Response) => {
 
     if (!blog.success) return res.status(httpStatus.internalServerError).send(blog)
 
-    if (!blog.data) return res.send({ msg: 'no blog found' })
+    if (!blog.data) return res.status(httpStatus.notFound).send({ msg: 'no blog found' })
 
     const format = {
       blogContent: {

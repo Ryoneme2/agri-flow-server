@@ -12,6 +12,53 @@ dotenv.config();
 
 const prisma = new P.PrismaClient();
 
+export const _addLine = async ({ username, email, imageProfile = defaultValue.blankImage }: {
+  username: string,
+  email: string,
+  imageProfile?: string
+}) => {
+  try {
+
+    await prisma.users.create({
+      data: {
+        username,
+        email,
+        imageProfile
+      }
+    })
+
+    return {
+      success: true,
+      msg: 'created'
+    }
+  } catch (error) {
+    console.log(error);
+    if (error instanceof P.Prisma.PrismaClientKnownRequestError) {
+      // The .code property can be accessed in a type-safe manner
+      if (error.code === 'P2002') {
+        return {
+          success: false,
+          data: {},
+          msg: `username is already taken`,
+        };
+      }
+      return {
+        success: false,
+        data: {},
+        msg: 'Internal Server Error register service',
+      };
+    }
+
+    return {
+      success: false,
+      data: {},
+      msg: 'Internal Server Error register service',
+    };
+  } finally {
+    await prisma.$disconnect()
+  }
+}
+
 export const _add = async ({ username, password, email, imageProfile = defaultValue.blankImage }: {
   username: string,
   password: string | null,

@@ -71,6 +71,68 @@ const singleSignOn = async (req: Request, res: Response) => {
   }
 }
 
+const singleSignOnLine = async (req: Request, res: Response) => {
+  try {
+    const data = req.body
+    // const { success, msg } = validateSchema(schema.registerSSOSchema, data)
+    // if (!success) return res.status(httpStatus.badRequest).send({ msg })
+
+    console.log({ data });
+
+    // const userData = await axios.post(`https://api.line.me/oauth2/v2.1/verify`, { id_token: data.token, client_id: 1657675273 })
+    const userData = await axios.post(
+      'https://api.line.me/oauth2/v2.1/verify',
+      new URLSearchParams({
+        'id_token': data.token,
+        'client_id': '1657675273'
+      })
+    );
+
+    console.log({ userData });
+
+    const user = await userService._getOneMail({ mail: userData.data.mail })
+
+    if (user === null) {
+      const resAddedUser = await userService._add({ username: userData.data.name, password: null, email: userData.data.email, imageProfile: userData.data.picture })
+      if (!resAddedUser.success) return res.sendStatus(httpStatus.internalServerError)
+    }
+
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret)
+      return res.status(httpStatus.internalServerError).send({
+        message: 'the key is not found',
+      });
+
+    const token = jwt.sign(
+      {
+        username: userData.data.user_id,
+        email: userData.data.email,
+      },
+      secret
+    );
+
+    res.send({
+      data: {
+        token,
+        user: {
+          imageProfile: userData.data.imageProfile,
+          username: userData.data.username
+        }
+      }
+    })
+
+  } catch (e) {
+    console.error(e);
+    if (e instanceof AxiosError) {
+      return res.status(httpStatus.badRequest).send({
+        msg: e.response?.data.error_description || 'error something about token'
+      })
+    }
+    return res.sendStatus(httpStatus.internalServerError)
+  }
+}
+
 const signupWithEmail = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body
@@ -230,5 +292,5 @@ export {
   signInWithEmail,
   singleSignOn,
   resetPasswordRequest,
-  resetPassword
+  resetPassword, singleSignOnLine
 }
